@@ -1,0 +1,56 @@
+.container {
+    width: 100%;
+    background: #d0d0d0;
+    color: black;
+    height: 85vh;
+
+}
+
+.chooseSensor {
+    background: #fff;
+    border-radius: 10px;
+    margin: 10px;
+}
+
+h1,
+h2 {
+    margin: 10px;
+}
+
+.overall {
+    display: flex;
+    align-items: center;
+}
+
+.overall>* {
+    display: flex;
+    flex: 1;
+}
+
+.overall>div {
+    justify-content: right;
+    margin: 10px;
+}
+
+
+.overall form select {
+    padding: 10px;
+    border-radius: 5px;
+    background: rgba(0, 0, 0, 0.2)
+}
+
+.listDevices {
+    display: flex;
+}
+
+.listDevices>* {
+    flex: 1;
+}
+
+.valueCard {
+    display: flex;
+}
+
+.valueCard>* {
+    flex: 1;
+}

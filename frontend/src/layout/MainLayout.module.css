@@ -1,0 +1,13 @@
+.container {
+    display: flex;
+    overflow: hidden;
+
+}
+
+.contentArea {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    transition: all 0.3s ease-in-out;
+    min-width: 0;
+}
