@@ -1,8 +1,9 @@
 .container {
     width: 100%;
-    background: #d0d0d0;
+    background: #efefef;
     color: black;
     height: 85vh;
+    padding: 10px;
 
 }
 
@@ -12,9 +13,22 @@
     margin: 10px;
 }
 
-h1,
-h2 {
-    margin: 10px;
+.title {
+    margin: 5px 10px;
+    font-size: 3em;
+    font-weight: bold;
+}
+
+.secondTitle {
+    margin: 5px 10px;
+    font-size: 2em;
+    font-weight: bold;
+
+}
+
+.subTitle {
+    margin: 5px 10px;
+
 }
 
 .overall {
@@ -45,6 +59,7 @@ h2 {
 
 .listDevices>* {
     flex: 1;
+    min-width: 0;
 }
 
 .valueCard {

@@ -1,41 +1,34 @@
-import { Route, BrowserRouter, createBrowserRouter } from 'react-router'
-import { HomeRoute } from './HomeRoute'
-import { LoginRoute } from './LoginRoute'
-import { OutputDevicesRoute } from './OutputDevicesRoute'
-import { SensorRoute } from './SensorRoute'
-import { HistoryRoute } from './HistoryRoute'
+import { createBrowserRouter } from 'react-router';
 
-import MainLayout from '../layout/MainLayout'
+import MainLayout from '../layout/MainLayout';
+
+import Home from '../pages/Home';
+import Login from '../pages/Login';
+import OutputDevices from '../pages/OutputDevices';
+import Sensor from '../pages/Sensor';
+import History from '../pages/History';
 
 export const router = createBrowserRouter([
     {
+        // 1. THE PROTECTED AREA (Uses SideBar/Header)
         path: "/",
         element: <MainLayout />,
-        children: HomeRoute
+        children: [
+            { index: true, element: <Home /> },           // URL: /
+            { path: "dashboard", element: <Home /> },    // URL: /dashboard
+            { path: "outputdevices", element: <OutputDevices /> }, // URL: /output
+            { path: "sensor", element: <Sensor /> },     // URL: /sensor
+            { path: "history", element: <History /> },   // URL: /history
+        ]
     },
     {
-        path: "/dashboard",
-        element: <MainLayout />,
-        children: HomeRoute
-    },
-    {
+        // 2. THE PUBLIC AREA (No SideBar)
         path: "/login",
-        children: LoginRoute,
+        element: <Login />
     },
     {
-        path: "/outputdevices",
-        element: <MainLayout />,
-        children: OutputDevicesRoute,
-    },
-    {
-        path: "/sensor",
-        element: <MainLayout />,
-        children: OutputDevicesRoute,
-    },
-    {
-        path: "/history",
-        element: <MainLayout />,
-        children: OutputDevicesRoute,
-    },
-
-])
+        // 3. THE "OVAL" (Catch-all for 404 errors)
+        path: "*",
+        element: <div>404 - Page Not Found</div>
+    }
+]);

@@ -12,8 +12,8 @@ export default function Home() {
     }
 
     return <div className={s.container}>
-        <h1>Dashboard</h1>
-        <h2>Tổng quan hệ thống nhà thông minh</h2>
+        <p className={s.title}>Dashboard</p>
+        <p className={s.subTitle}>Tổng quan hệ thống nhà thông minh</p>
         <div className={s.listDevices}>
             <TotalCard name="Tong thiet bi" total={16} icon="fa-brands fa-chromecast" colorName="black" />
             <TotalCard name="Dang hoat dong" total={15} icon="fa-solid fa-signal" colorName="green" />
@@ -22,7 +22,7 @@ export default function Home() {
         </div>
         <div className={s.chooseSensor}>
             <div className={s.overall}>
-                <h1>Tổng quan về thiết bị tại</h1>
+                <p className={s.secondTitle}>Tổng quan về thiết bị tại</p>
                 <div>
                     <form>
                         <select value={place} onChange={handlePlace}>

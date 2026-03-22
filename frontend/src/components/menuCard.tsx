@@ -24,7 +24,7 @@ export default function MenuCard({ icon, name }: { icon: string, name: menuType 
     };
 
     return <div style={dynamicStyle} onMouseEnter={() => setIsHover(true)}
-        onMouseLeave={() => setIsHover(false)} onClick={() => { handleClick(name); navigate('/' + name.toLowerCase(), { replace: true }) }}>
+        onMouseLeave={() => setIsHover(false)} onClick={() => { handleClick(name); navigate('/' + name.toLowerCase()) }}>
         <div style={{ marginRight: '10px' }}>
             <i className={icon}></i>
         </div>

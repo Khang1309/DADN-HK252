@@ -1,9 +1,20 @@
 import '../index.css'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useUserInfoStore } from '../store/useUserStore'
 
+export default function UserCard() {
 
-export default function UserCard({ UserInfo }: { UserInfo: any }) {
+    const { info, isLoading, err, fetchUserInfo } = useUserInfoStore()
     const [isHover, setIsHover] = useState(false)
+
+    useEffect(() => {
+        fetchUserInfo()
+    }, [fetchUserInfo])
+
+    if (isLoading) return <div>Loading user info...</div>;
+    if (err) return <div className="text-red-500">{err}</div>;
+    if (!info) return <div>No data found</div>
+
     const profileStyle = {
         ...styles.profile, cursor: 'pointer',
         background: isHover ? 'blue' : 'lightblue',
@@ -11,10 +22,10 @@ export default function UserCard({ UserInfo }: { UserInfo: any }) {
     return (
         <div style={styles.container} >
             <div style={styles.nameContainer}>
-                <div style={styles.userName}> {UserInfo.name} </div>
-                <div style={styles.userRole}> {UserInfo.role} </div>
+                <div style={styles.userName}> {info.name} </div>
+                <div style={styles.userRole}> {info.role} </div>
             </div>
-            <div style={profileStyle} onMouseEnter={() => setIsHover(true)} onMouseLeave={() => setIsHover(false)}>{UserInfo.profile}</div>
+            <div style={profileStyle} onMouseEnter={() => setIsHover(true)} onMouseLeave={() => setIsHover(false)}>{info.name[0].toUpperCase()}</div>
         </div>
     )
 }
@@ -26,7 +37,7 @@ const styles = {
     },
     nameContainer: {
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'column' as const,
 
         alignItems: 'flex-end',
         flex: 1,

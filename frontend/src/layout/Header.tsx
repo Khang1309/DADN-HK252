@@ -1,9 +1,8 @@
 import s from './Header.module.css'
 import UserCard from '../components/userCard'
 import '../index.css'
-import { useState } from 'react'
 
-export default function Header({ UserInfo, onMenuClick }: { UserInfo: any, onMenuClick: () => void }) {
+export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
     const toggleSideBar = onMenuClick
     return (
         <div className={s.container}>
@@ -15,7 +14,7 @@ export default function Header({ UserInfo, onMenuClick }: { UserInfo: any, onMen
                 <div>Hệ thống quản lý nhà thông minh</div>
             </div>
             <div className={s.rightHeader}>
-                <UserCard UserInfo={UserInfo} />
+                <UserCard />
             </div>
         </div>
     )
