@@ -1,12 +1,11 @@
 import { type SensorType } from "../schema/sensor"
-import { useState } from "react"
+import { GoPencil } from "react-icons/go";
+import { MdOutlineDelete } from "react-icons/md";
+import { theme } from "../utils/theme";
 
 
 
 export default function SensorInfoCard({ sensorInfo }: { sensorInfo: SensorType }) {
-
-    const [isAdjust, setIsAdjust] = useState(false)
-
 
     const statusColor = {
         ...styles.status, background: sensorInfo.state ? '#86f9a8' : '#ff6666'
@@ -14,25 +13,32 @@ export default function SensorInfoCard({ sensorInfo }: { sensorInfo: SensorType 
 
     return <div style={styles.container}>
         <div style={styles.title}>
-            <div style={styles.nameAndPlace}>
-                <div style={styles.name}>{sensorInfo.name}</div>
-                <div style={styles.place}>{sensorInfo.place}</div>
+            <div style={styles.name}>
+                <div style={styles.deviceName}>Name: {sensorInfo.name} <span style={{ cursor: 'pointer' }}><GoPencil /></span></div>
+                <div style={styles.devicePlace}>Place: {sensorInfo.place}</div>
             </div>
-            <div style={statusColor}>{sensorInfo.state ? 'Online' : 'Offline'}</div>
-        </div>
-        <div style={styles.value}>
-            {(sensorInfo.sensor_data != null) ? sensorInfo.sensor_data.value + sensorInfo.unit : "No value"}
-        </div>
-        <div style={styles.content}>
-            <div style={styles.minThres}>
-                <div>Min</div>
-                <form action=""></form>
-                <input style={styles.thresValue} defaultValue={sensorInfo.threshold_min}></input>
+            <div style={{ marginLeft: 'auto', display: 'flex', flexDirection: 'column' }}>
+                <div style={statusColor}>{sensorInfo.state ? 'Online' : 'Offline'}</div>
+                <div style={{ marginLeft: 'auto', cursor: 'pointer', color: theme.dashboardTheme.roomCardDelete }}><MdOutlineDelete /></div>
             </div>
-            <div>-</div>
-            <div style={styles.maxThres}>
-                <input style={styles.thresValue} defaultValue={sensorInfo.threshold_max}></input>
-                <div>Max</div>
+        </div>
+        <div style={styles.action}>
+            <div style={styles.value}>
+                <div style={{ flex: '2' }}>Giá trị hiện tại </div>
+                <div style={{ flex: '1', fontSize: '1.2rem', fontWeight: 'bold', left: 'auto' }}>
+                    {(sensorInfo.sensor_data != null) ? sensorInfo.sensor_data.value + sensorInfo.unit : "No value"}
+                </div>
+            </div>
+            <div style={styles.thresholds}>
+                <div style={styles.minThres}>
+                    <div>Min</div>
+                    <input style={styles.thresValue} defaultValue={sensorInfo.threshold_min}></input>
+                </div>
+                <div>-</div>
+                <div style={styles.maxThres}>
+                    <input style={styles.thresValue} defaultValue={sensorInfo.threshold_max}></input>
+                    <div>Max</div>
+                </div>
             </div>
         </div>
     </div>
@@ -40,71 +46,81 @@ export default function SensorInfoCard({ sensorInfo }: { sensorInfo: SensorType 
 
 const styles = {
     container: {
-        width: '100%',
-        padding: '10px',
-        background: 'white',
-        border: 'solid gray 1px',
+        display: 'flex',
+        flexDirection: 'column' as const,
+        background: '#fff',
         borderRadius: '10px',
+        overflow: 'hidden',
+        border: 'solid black 1px'
     },
     title: {
         display: 'flex',
-    },
-    nameAndPlace: {
-        width: '70%',
-    },
-
-    value: {
-        display: 'flex',
-        justifyContent: 'center',
-        fontSize: '1.8rem',
-        fontWeight: '700',
-        background: 'rgba(0,0,0,0.2)',
-        border: '2px gray solid',
-        borderRadius: '10px',
-        margin: '5px 10px',
+        background: 'rgba(0,0,0,0.1)',
+        padding: '5px 10px',
     },
     name: {
-        fontSize: '1.5rem',
-        fontWeight: 'bold',
-    },
-    place: {
-
+        display: 'flex',
+        flexDirection: 'column' as const,
+        width: '80%',
     },
     status: {
-        marginLeft: 'auto',
         color: '#fff',
         borderRadius: '8px',
         height: '24px',
         padding: '3px 6px',
         display: 'flex',
-
         fontSize: '0.8em',
-
-
+        marginBottom: '5px'
     },
-    content: {
+    deviceName: {
+        fontSize: '1.3em',
+        fontWeight: '600',
+    },
+    devicePlace: {
+        fontSize: '1em',
+        color: 'gray',
+    },
+    action: {
+        margin: '10px',
         display: 'flex',
-        justifyContent: 'center',
         alignItems: 'center',
+        justifyContent: 'center',
+    },
+    value: {
+        display: 'flex',
+        width: '60%',
+        background: 'rgba(0,0,0,0.1)',
+        borderRadius: '10px',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '10px',
+        marginRight: '10px',
+    },
+    thresholds: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '40%',
     },
     minThres: {
         display: 'flex',
-        margin: '10px',
+        margin: '0 5px',
         alignItems: 'center',
         justifyContent: 'right'
     },
     maxThres: {
         display: 'flex',
-        margin: '10px',
+        margin: '0 5px',
         alignItems: 'center',
     },
     thresValue: {
-        padding: '10px',
+        padding: '5px',
         border: '1px gray solid',
         background: 'rgba(0,0,0,0.1)',
-        borderRadius: '10px',
-        margin: '0 10px',
-        width: '20%',
-        color: '#000'
+        borderRadius: '5px',
+        margin: '0 5px',
+        width: '40px',
+        color: '#000',
+        textAlign: 'center' as const,
     }
 }

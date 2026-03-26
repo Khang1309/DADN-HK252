@@ -1,12 +1,14 @@
 .container {
     display: flex;
     overflow: hidden;
-
+    height: 100vh;
+    background-color: #efefef;
 }
 
 .contentArea {
     display: flex;
     flex-direction: column;
+    overflow-y: overlay;
     flex: 1;
     transition: all 0.3s ease-in-out;
     min-width: 0;

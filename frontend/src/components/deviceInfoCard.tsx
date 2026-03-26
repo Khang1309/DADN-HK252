@@ -1,12 +1,9 @@
 import TripleToggle from "./toggleButton";
 import { type DeviceDataType } from '../schema/device';
-
+import { GoPencil } from "react-icons/go";
+import { MdOutlineDelete } from "react-icons/md";
+import { theme } from "../utils/theme";
 export default function DeviceInfoCard({ device, haveValue }: { device: DeviceDataType, haveValue: boolean }) {
-
-    const typeOfIcon = {
-        fan: "fa-solid fa-fan",
-        light: "fa-solid fa-lightbulb"
-    };
 
     const statusColor = {
         ...styles.status, background: device.state ? '#86f9a8' : '#ff6666'
@@ -14,27 +11,25 @@ export default function DeviceInfoCard({ device, haveValue }: { device: DeviceDa
 
     return <div style={styles.container}>
         <div style={styles.title}>
-            <div style={styles.icon}>
-                <i className={typeOfIcon[device.type as keyof typeof typeOfIcon]}></i>
-            </div>
             <div style={styles.name}>
-                <div style={styles.deviceName}>{device.name}</div>
-                <div style={styles.devicePlace}>{device.place}</div>
+                <div style={styles.deviceName}>Name: {device.name} <span style={{ cursor: 'pointer' }}><GoPencil /></span></div>
+                <div style={styles.devicePlace}>Place: {device.place}</div>
             </div>
+            <div style={{ marginLeft: 'auto', display: 'flex', flexDirection: 'column' }}>
 
-            <div style={statusColor}>{device.state ? 'Online' : 'Offline'}</div>
-
+                <div style={statusColor}>{device.state ? 'Online' : 'Offline'}</div>
+                <div style={{ marginLeft: 'auto', cursor: 'pointer', color: theme.dashboardTheme.roomCardDelete }}><MdOutlineDelete /></div>
+            </div>
         </div>
-        <div style={styles.action}><TripleToggle /></div>
-        {haveValue ?
-            <div style={styles.value}>
-                <div style={{ flex: '2' }}>Giá trị hiện tại </div>
-                <div style={{ flex: '1', fontSize: '1.2rem', fontWeight: 'bold', left: 'auto' }}>{device.value} {device.unit}</div>
-            </div> : <div>
-
-            </div>
-        }
-
+        <div style={styles.action}>
+            {haveValue &&
+                <div style={styles.value}>
+                    <div style={{ flex: '2' }}>Giá trị hiện tại </div>
+                    <div style={{ flex: '1', fontSize: '1.2rem', fontWeight: 'bold', left: 'auto' }}>{device.value} {device.unit}</div>
+                </div>
+            }
+            <TripleToggle />
+        </div>
     </div>
 }
 
@@ -43,7 +38,6 @@ const styles = {
         display: 'flex',
         flexDirection: 'column' as const,
         background: '#fff',
-        width: '25%',
         borderRadius: '10px',
         overflow: 'hidden',
         border: 'solid black 1px'
@@ -57,7 +51,7 @@ const styles = {
     title: {
         display: 'flex',
         background: 'rgba(0,0,0,0.1)',
-        padding: '5px 0px',
+        padding: '5px 10px',
 
     },
     name: {
@@ -71,9 +65,9 @@ const styles = {
         height: '24px',
         padding: '3px 6px',
         display: 'flex',
-        alignItems: 'center',
+
         fontSize: '0.8em',
-        margin: '5px',
+        marginBottom: '5px'
 
     },
     deviceName: {
@@ -99,6 +93,6 @@ const styles = {
         alignItems: 'center',
         justifyContent: 'center',
         padding: '10px',
-        margin: '8px auto',
+        marginRight: '10px',
     },
 }

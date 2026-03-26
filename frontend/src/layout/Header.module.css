@@ -4,6 +4,13 @@
     width: 100%;
     height: 15vh;
     align-items: center;
+    position: sticky;
+
+    /* 2. Tell it WHERE to stick (0 pixels from the top of the content area) */
+    top: 0;
+
+    /* 3. Keep it on top! */
+    z-index: 30;
 }
 
 

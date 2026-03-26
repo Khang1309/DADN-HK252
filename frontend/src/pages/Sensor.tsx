@@ -9,7 +9,14 @@ export default function Sensor() {
     const { sensors, fetchSensors } = useSensorInfo()
 
     useEffect(() => {
-        fetchSensors()
+        fetchSensors();
+
+
+        const intervalId = setInterval(() => {
+            fetchSensors();
+        }, 10000);
+
+        return () => clearInterval(intervalId);
     }, [fetchSensors])
 
     return <div className={s.container}>

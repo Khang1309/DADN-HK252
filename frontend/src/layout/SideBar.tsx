@@ -18,8 +18,6 @@ const menuCardList: CardData[] = [
 ];
 
 
-
-
 export default function SideBar({ isOpen }: { isOpen: boolean }) {
 
     const val = {

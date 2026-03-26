@@ -11,7 +11,7 @@ interface UserInfoState {
 }
 
 const mock: UserInfoType = {
-    name: "Khang", role: "Admin"
+    name: "Khang",
 }
 
 export const useUserInfoStore = create<UserInfoState>((set) => ({

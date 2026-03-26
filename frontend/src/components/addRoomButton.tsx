@@ -1,7 +1,7 @@
 import '../index.css'
 import { useState } from 'react'
 
-export default function AddDeviceButton() {
+export default function AddRoomButton() {
 
     const [isHover, setIsHover] = useState(false)
 
@@ -14,7 +14,7 @@ export default function AddDeviceButton() {
             <i className="fa-solid fa-plus"></i>
         </div>
         <div style={{ marginLeft: '5px' }}>
-            Thêm thiết bị của bạn
+            Thêm phòng
         </div>
     </div>
 }

@@ -12,6 +12,7 @@ export default function MainLayout() {
 
     return <div className={s.container}>
         <SideBar isOpen={openMenu}></SideBar>
+
         <div className={s.contentArea}>
             <Header onMenuClick={() => setOpenMenu(!openMenu)} />
             <Outlet />

@@ -23,7 +23,6 @@ export default function UserCard() {
         <div style={styles.container} >
             <div style={styles.nameContainer}>
                 <div style={styles.userName}> {info.name} </div>
-                <div style={styles.userRole}> {info.role} </div>
             </div>
             <div style={profileStyle} onMouseEnter={() => setIsHover(true)} onMouseLeave={() => setIsHover(false)}>{info.name[0].toUpperCase()}</div>
         </div>
@@ -38,7 +37,7 @@ const styles = {
     nameContainer: {
         display: 'flex',
         flexDirection: 'column' as const,
-
+        justifyContent: 'center',
         alignItems: 'flex-end',
         flex: 1,
     },

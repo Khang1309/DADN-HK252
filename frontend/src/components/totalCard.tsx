@@ -27,7 +27,6 @@ const styles = {
         flexDirection: 'column' as 'column',
         alignItems: 'center',
         padding: '15px',
-        margin: '10px',
         background: '#ffffff',
         borderRadius: '5px',
     },

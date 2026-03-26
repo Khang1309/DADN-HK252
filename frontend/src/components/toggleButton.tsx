@@ -6,9 +6,9 @@ export default function CheckboxToggle() {
 
     function getTransformString() {
         if (isChecked === 'on') return 'translate(2px, -50%)';
-        if (isChecked === 'off') return 'translate(35px, -50%)';
+        if (isChecked === 'off') return 'translate(32px, -50%)';
 
-        return 'translate(75px, -50%)';
+        return 'translate(70px, -50%)';
     }
 
     const dynamicBallStyle = {
@@ -61,7 +61,7 @@ const styles = {
         display: 'inline-block',
         position: 'absolute' as 'absolute',
         top: '50%',
-        width: '40px',
+        width: '35px',
         height: '25px',
         backgroundColor: '#bcbcbc',
         borderRadius: '25px',
@@ -73,7 +73,7 @@ const styles = {
         position: 'absolute' as 'absolute',
         top: '50%',
         transform: 'translateY(-50%)',
-        left: '15px',
+        left: '10px',
         fontSize: '12px',
         color: '#000000', // Colored to match the border
         zIndex: 10,
@@ -93,7 +93,7 @@ const styles = {
         position: 'absolute' as 'absolute',
         top: '50%',
         transform: 'translateY(-50%)',
-        right: '10px',
+        right: '7px',
         fontSize: '12px',
         color: '#000000',
         zIndex: 10,
