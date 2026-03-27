@@ -15,7 +15,7 @@ interface DeviceStore {
     devices: DeviceDataType[];
 
     fetchDevices: () => Promise<void>
-
+    changeDeviceName: (id: number, newName: string) => Promise<boolean>
     updateDevice: (id: number, newValue: number) => void;
     updateAction: (id: number, action: string) => void;
 }
@@ -32,6 +32,23 @@ export const useDeviceStore = create<DeviceStore>((set) => ({
             // set({ devices: data })
         } catch (error) {
             console.log(`Error when getting device info ${error}`)
+        }
+    },
+    changeDeviceName: async (id: number, newName: string) => {
+        try {
+            // const response = await axiosClient.put("", newName);
+            // if (!response.data) { return false; }
+
+            // set((state) => ({
+            //     devices: state.devices.map((device) =>
+            //         device.id === id ? { ...device, name: newName } : device
+            //     )
+            // }));
+
+            return true
+        } catch (error) {
+            console.log(`Error changing device name ${error}`)
+            return false;
         }
     },
 

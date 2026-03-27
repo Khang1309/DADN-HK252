@@ -5,8 +5,9 @@ import axiosClient from "../apis/api";
 interface RoomInfoInterface {
     rooms: RoomType[],
 
-    fetchRooms: () => Promise<void>
-
+    fetchRooms: () => Promise<void>,
+    changeRoomName: (id: number, newName: string) => Promise<boolean>,
+    addRoom: (roomName: string) => Promise<void>
 }
 
 const mockRoom = [
@@ -163,6 +164,30 @@ export const useRoomInfo = create<RoomInfoInterface>((set) => ({
             set({ rooms: mockRoom })
         } catch (error) {
             console.log(`Error getting room info ${error}`)
+        }
+    },
+    changeRoomName: async (id: number, newName: string) => {
+        try {
+            // const response = await axiosClient.put("", newName);
+            // if (!response.data) { return false; }
+
+            // set((state) => ({
+            //     rooms: state.rooms.map((room) =>
+            //         room.roomId === id ? { ...room, roomName: newName } : room
+            //     )
+            // }));
+
+            return true
+        } catch (error) {
+            console.log(`Error changing room name ${error}`)
+            return false;
+        }
+    },
+    addRoom: async (roomName: string) => {
+        try {
+            await axiosClient.post("", roomName)
+        } catch (error) {
+            console.log(`Error while add room ${error}`)
         }
     }
 }))

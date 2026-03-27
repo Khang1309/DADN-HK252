@@ -7,6 +7,10 @@ export const theme = {
     dashboardTheme: {
         roomCardBackground: '#fff',
         roomCardDelete: '#fa1c1c',
-        addDevicesButton: '#4a5569'
+        addDevicesButton: '#4a5569',
+        buttonColor: '#4f39f6',
+    },
+    sidebarTheme: {
+        menuCardBg: '#4f39f6',
     }
 }

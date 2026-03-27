@@ -5,14 +5,15 @@ import { type SensorType, SensorInfoList } from "../schema/sensor";
 interface SensorStore {
     sensors: SensorType[],
     fetchSensors: () => Promise<void>,
+    changeSensorName: (id: number, newName: string) => Promise<boolean>,
 }
 
 const mockSensors: SensorType[] = [
     {
         id: 1,
-        name: 'Living Room Temp',
+        name: 'Living sensor Temp',
         type: 'temperature',
-        place: 'Living Room',
+        place: 'Living sensor',
         unit: '°C',
         state: true,
         threshold_min: 16,
@@ -24,9 +25,9 @@ const mockSensors: SensorType[] = [
     },
     {
         id: 2,
-        name: 'Bathroom Humidity',
+        name: 'Bathsensor Humidity',
         type: 'humidity',
-        place: 'Bathroom',
+        place: 'Bathsensor',
         unit: '%',
         state: true,
         threshold_min: 30,
@@ -64,6 +65,23 @@ export const useSensorInfo = create<SensorStore>((set) => ({
         }
         catch (err) {
             console.log(`Error getting sensor data ${err}`)
+        }
+    },
+    changeSensorName: async (id: number, newName: string) => {
+        try {
+            // const response = await axiosClient.put("", newName);
+            // if (!response.data) { return false; }
+
+            // set((state) => ({
+            //     sensors: state.sensors.map((sensor) =>
+            //         sensor.id === id ? { ...sensor, name: newName } : sensor
+            //     )
+            // }));
+
+            return true
+        } catch (error) {
+            console.log(`Error changing sensor name ${error}`)
+            return false;
         }
     }
 }))

@@ -1,19 +1,26 @@
 import { useState } from "react";
+import { useHeight } from "../hooks/getWidth";
 
 export default function CheckboxToggle() {
     //replace this with  Zustand store state 
     const [isChecked, setIsChecked] = useState('on');
 
-    function getTransformString() {
-        if (isChecked === 'on') return 'translate(2px, -50%)';
-        if (isChecked === 'off') return 'translate(32px, -50%)';
+    const [measureRef, height, width] = useHeight();
 
-        return 'translate(70px, -50%)';
+    const ballWidth = width / 3;
+    const ballHeigth = 0.9 * height;
+
+    function getTransformString() {
+        if (isChecked === 'on') return `translate(2px, -50%)`;
+        if (isChecked === 'off') return `translate(${width / 2 - ballWidth / 2 - 3}px, -50%)`;
+
+        return `translate(${width - 2 - ballWidth}px , -50%)`;
     }
 
     const dynamicBallStyle = {
         ...styles.ball,
-
+        height: ballHeigth,
+        width: ballWidth,
         transform: getTransformString(),
     };
 
@@ -31,8 +38,8 @@ export default function CheckboxToggle() {
     }
 
     return (
-        <label style={styles.toggler}>
-
+        <label ref={measureRef} style={styles.toggler}>
+            <div></div>
             <input
                 type="checkbox"
                 style={{ display: 'none' }}
@@ -61,8 +68,6 @@ const styles = {
         display: 'inline-block',
         position: 'absolute' as 'absolute',
         top: '50%',
-        width: '35px',
-        height: '25px',
         backgroundColor: '#bcbcbc',
         borderRadius: '25px',
         left: '1px',

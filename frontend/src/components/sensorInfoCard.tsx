@@ -2,19 +2,61 @@ import { type SensorType } from "../schema/sensor"
 import { GoPencil } from "react-icons/go";
 import { MdOutlineDelete } from "react-icons/md";
 import { theme } from "../utils/theme";
-
+import { useState } from "react";
+import { useSensorInfo } from "../store/useSensorInfo";
+import toast from "react-hot-toast";
 
 
 export default function SensorInfoCard({ sensorInfo }: { sensorInfo: SensorType }) {
+    const editName = useSensorInfo((s) => s.changeSensorName)
+    const [isEdit, setIsEdit] = useState(false);
 
     const statusColor = {
         ...styles.status, background: sensorInfo.state ? '#86f9a8' : '#ff6666'
     }
 
+    const handleSubmitNameChange = async (e: React.ChangeEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const newName = formData.get("sensorName") as string;
+
+
+        const success = await editName(sensorInfo.id, newName)
+        if (success) {
+
+            toast.success("Changed name successfully!")
+        }
+
+        else {
+            toast.error("Changed name failed!")
+        }
+        setIsEdit(false);
+    }
+
+    const submitButton = {
+        ...styles.button,
+        color: 'white',
+        background: theme.dashboardTheme.buttonColor,
+    }
+    const cancelButton = {
+        ...styles.button,
+        background: 'rgba(0,0,0,0.2)',
+    }
+
     return <div style={styles.container}>
         <div style={styles.title}>
             <div style={styles.name}>
-                <div style={styles.deviceName}>Name: {sensorInfo.name} <span style={{ cursor: 'pointer' }}><GoPencil /></span></div>
+                {isEdit ? (
+                    <form style={{ display: 'flex', alignItems: 'center', gap: '5px' }} onSubmit={handleSubmitNameChange}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <input style={styles.editInput} type="text" name="sensorName" defaultValue={sensorInfo.name} />
+                        </div>
+                        <button style={submitButton} type="submit">Save</button>
+                        <button style={cancelButton} type="button" onClick={() => setIsEdit(false)}>Cancel</button>
+                    </form>
+                ) : (
+                    <div style={styles.deviceName}>Name: {sensorInfo.name} <span style={{ cursor: 'pointer' }} onClick={() => setIsEdit(true)}><GoPencil /></span></div>
+                )}
                 <div style={styles.devicePlace}>Place: {sensorInfo.place}</div>
             </div>
             <div style={{ marginLeft: 'auto', display: 'flex', flexDirection: 'column' }}>
@@ -73,11 +115,11 @@ const styles = {
         marginBottom: '5px'
     },
     deviceName: {
-        fontSize: '1.3em',
+        fontSize: '1.1em',
         fontWeight: '600',
     },
     devicePlace: {
-        fontSize: '1em',
+        fontSize: '0.8em',
         color: 'gray',
     },
     action: {
@@ -122,5 +164,25 @@ const styles = {
         width: '40px',
         color: '#000',
         textAlign: 'center' as const,
+    },
+    button: {
+        all: 'unset' as const,
+        padding: '5px 10px',
+        background: 'none',
+        color: 'inherit',
+        border: 'none',
+        font: 'inherit' as const,
+        cursor: 'pointer',
+        outline: 'inherit' as const,
+        borderRadius: '10px',
+    },
+    editInput: {
+        fontSize: '1.3em',
+        fontWeight: '500',
+        background: 'rgba(0,0,0,0.2)',
+        padding: '3px 10px',
+        appearance: 'none' as const,
+        border: 'none',
+        borderRadius: '5px',
     }
 }

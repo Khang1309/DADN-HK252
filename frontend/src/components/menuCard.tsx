@@ -2,6 +2,7 @@ import '../index.css'
 import { useState } from 'react'
 import useMenuState from '../store/useMenuState'
 import { useNavigate } from 'react-router';
+import { theme } from '../utils/theme';
 
 type menuType = "Dashboard" | "OutputDevices" | "Sensor" | "History";
 
@@ -19,7 +20,8 @@ export default function MenuCard({ icon, name }: { icon: string, name: menuType 
     const dynamicStyle = {
         ...styles.container,
         // Logic: if active -> blue, else if hover -> lightgray, else -> white
-        background: isActive ? '#67fcff' : (isHover ? '#f0f0f0' : '#fff'),
+        background: isActive ? (theme.sidebarTheme.menuCardBg) : (isHover ? '#f0f0f0' : '#fff'),
+        color: isActive ? '#fff' : '#000',
         transition: '0.2s all ease',
     };
 
@@ -37,7 +39,7 @@ const styles = {
         display: 'flex',
         padding: '15px',
         cursor: 'pointer',
-        width: '80%',
+        width: '90%',
         justifyContent: 'center',
         alignItems: 'center',
         height: '50px',

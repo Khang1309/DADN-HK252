@@ -1,7 +1,7 @@
 import s from './SideBar.module.css'
 import MenuCard from '../components/menuCard'
-import useMenuState from "../store/useMenuState";
 
+import { theme } from '../utils/theme';
 type menuType = "Dashboard" | "OutputDevices" | "Sensor" | "History";
 
 interface CardData {
@@ -12,9 +12,8 @@ interface CardData {
 
 const menuCardList: CardData[] = [
     { index: 1, icon: "fa-solid fa-house", name: "Dashboard" },
-    { index: 2, icon: "fa-solid fa-hard-drive", name: "OutputDevices" },
-    { index: 3, icon: "fa-solid fa-microchip", name: "Sensor" },
-    { index: 4, icon: "fa-solid fa-history", name: "History" },
+
+    { index: 3, icon: "fa-solid fa-history", name: "History" },
 ];
 
 
@@ -55,7 +54,8 @@ const styles = {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: '#527bf4',
+        background: theme.sidebarTheme.menuCardBg,
+        color: 'white',
         margin: '0 auto',
         width: '100%',
         fontWeight: 'bold',

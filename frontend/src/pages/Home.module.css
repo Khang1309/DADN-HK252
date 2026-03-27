@@ -13,6 +13,10 @@
     margin: 10px 0px;
 }
 
+.yourRoom>div:first-child {
+    font-size: 1.1em;
+}
+
 .listOfRooms {
     display: grid;
 
@@ -42,7 +46,7 @@
 
 .subTitle {
     margin: 5px 0px;
-
+    font-size: 1.1em;
 }
 
 .overall {

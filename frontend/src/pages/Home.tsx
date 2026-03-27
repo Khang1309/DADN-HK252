@@ -6,6 +6,7 @@ import AddRoomButton from "../components/addRoomButton"
 import { useRoomInfo } from "../store/useRoomInfo"
 import RoomCard from "../components/roomCard"
 
+
 export default function Home() {
 
     const rooms = useRoomInfo((state) => state.rooms)
@@ -15,6 +16,7 @@ export default function Home() {
     const handlePlace = (event: any) => {
         setPlace(event.target.value)
     }
+
 
     useEffect(() => {
         fetch()
