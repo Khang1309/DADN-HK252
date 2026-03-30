@@ -1,7 +1,7 @@
 import s from './OutputDevices.module.css'
-import AddDeviceButton from '../components/addDeviceButton'
+import AddDeviceButton from '../components/button/addDeviceButton'
 import { useEffect, useState } from 'react'
-import DeviceInfoCard from '../components/deviceInfoCard'
+import DeviceInfoCard from '../components/card/deviceInfoCard'
 import { useDeviceStore } from '../store/useDeviceInfo'
 
 export default function OutputDevices() {

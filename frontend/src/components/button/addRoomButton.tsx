@@ -1,12 +1,12 @@
-import '../index.css'
+import '../../index.css'
 import { useState } from 'react'
-import { theme } from '../utils/theme'
+import { theme } from '../../utils/theme'
 export default function AddRoomButton() {
 
     const [isHover, setIsHover] = useState(false)
 
     const buttonStyle = {
-        ...styles.container, background: isHover ? theme.dashboardTheme.addDevicesButton : theme.dashboardTheme.buttonColor
+        ...styles.container, background: isHover ? theme.dashboardTheme.buttonColor : theme.dashboardTheme.addRoomBtn
     }
 
     return <div style={buttonStyle} onMouseEnter={() => setIsHover(true)} onMouseLeave={() => setIsHover(false)}>
@@ -25,5 +25,6 @@ const styles = {
         color: 'white',
         padding: '10px',
         borderRadius: '10px',
+        cursor: 'pointer',
     }
 }

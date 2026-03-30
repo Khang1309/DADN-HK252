@@ -1,5 +1,5 @@
 import s from './SideBar.module.css'
-import MenuCard from '../components/menuCard'
+import MenuCard from '../components/card/menuCard'
 
 import { theme } from '../utils/theme';
 type menuType = "Dashboard" | "OutputDevices" | "Sensor" | "History";

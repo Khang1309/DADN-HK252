@@ -6,6 +6,10 @@
 
 }
 
+.roomContainer {
+    display: flex;
+    flex-direction: column;
+}
 
 .yourRoom {
     display: flex;
@@ -20,7 +24,7 @@
 .listOfRooms {
     display: grid;
 
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(1, 1fr);
     gap: 10px;
 
 }
@@ -49,6 +53,53 @@
     font-size: 1.1em;
 }
 
+.editNameBox {
+    padding: 10px;
+    background: #fff;
+    box-shadow: 2px 2px #e5e7eb;
+}
+
+.button {
+    all: unset;
+    padding: 5px 10px;
+    background: none;
+    color: inherit;
+    border: none;
+    font: inherit;
+    cursor: pointer;
+    outline: inherit;
+    flex: 1;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    height: 35px;
+    border-radius: 10px;
+    margin: 0 3px;
+    line-height: 1;
+
+    box-sizing: border-box;
+
+    white-space: nowrap;
+    vertical-align: middle;
+    border: 1px solid transparent;
+}
+
+.editName {
+    font-size: 1.3em;
+    margin-right: 10px;
+    font-weight: 500;
+    background: rgba(0, 0, 0, 0.1);
+    padding: 5px 10px;
+    appearance: none;
+    border: none;
+    border-radius: 5px;
+    flex: 8;
+    min-width: 0;
+}
+
+
+
+/* dont need */
 .overall {
     display: flex;
     align-items: center;

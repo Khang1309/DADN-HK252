@@ -1,6 +1,6 @@
 import s from './Sensor.module.css'
-import AddDeviceButton from '../components/addDeviceButton'
-import SensorInfoCard from '../components/sensorInfoCard'
+import AddDeviceButton from '../components/button/addDeviceButton'
+import SensorInfoCard from '../components/card/sensorInfoCard'
 import { useSensorInfo } from '../store/useSensorInfo'
 import { useEffect } from 'react'
 

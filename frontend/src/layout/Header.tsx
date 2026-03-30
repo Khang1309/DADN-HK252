@@ -1,5 +1,5 @@
 import s from './Header.module.css'
-import UserCard from '../components/userCard'
+import UserCard from '../components/card/userCard'
 import '../index.css'
 
 export default function Header({ onMenuClick }: { onMenuClick: () => void }) {

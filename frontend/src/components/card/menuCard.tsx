@@ -1,8 +1,8 @@
-import '../index.css'
+import '../../index.css'
 import { useState } from 'react'
-import useMenuState from '../store/useMenuState'
+import useMenuState from '../../store/useMenuState'
 import { useNavigate } from 'react-router';
-import { theme } from '../utils/theme';
+import { theme } from '../../utils/theme';
 
 type menuType = "Dashboard" | "OutputDevices" | "Sensor" | "History";
 

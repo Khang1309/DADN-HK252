@@ -1,17 +1,18 @@
-import TripleToggle from "./toggleButton";
-import { type DeviceDataType } from '../schema/device';
+import TripleToggle from "../button/toggleButton";
+import { type DeviceDataType } from '../../schema/device';
 import { GoPencil } from "react-icons/go";
 import { MdOutlineDelete } from "react-icons/md";
-import { theme } from "../utils/theme";
+import { theme } from "../../utils/theme";
 import { useState } from "react";
-import { useDeviceStore } from "../store/useDeviceInfo";
+import { useDeviceStore } from "../../store/useDeviceInfo";
 import toast from "react-hot-toast";
-export default function DeviceInfoCard({ device, haveValue }: { device: DeviceDataType, haveValue: boolean }) {
+export default function DeviceInfoCard({ device, roomId }: { device: DeviceDataType, roomId: string }) {
     const editName = useDeviceStore((s) => s.changeDeviceName)
+    const [deviceNameState, setDeviceName] = useState(device.deviceName)
     const [isEdit, setIsEdit] = useState(false);
 
     const statusColor = {
-        ...styles.status, background: device.state ? '#86f9a8' : '#ff6666'
+        ...styles.status, background: device.state === 'CONNECTED' ? '#86f9a8' : '#ff6666'
     }
 
     const handleSubmitNameChange = async (e: React.ChangeEvent<HTMLFormElement>) => {
@@ -19,9 +20,9 @@ export default function DeviceInfoCard({ device, haveValue }: { device: DeviceDa
         const formData = new FormData(e.currentTarget);
         const newName = formData.get("deviceName") as string;
 
-        const success = await editName(device.id, newName)
+        const success = await editName(device.deviceId, newName, roomId)
         if (success) {
-
+            setDeviceName(newName)
             toast.success("Changed name successfully!")
         }
 
@@ -47,30 +48,30 @@ export default function DeviceInfoCard({ device, haveValue }: { device: DeviceDa
                 {isEdit ? (
                     <form style={{ display: 'flex', alignItems: 'center', gap: '5px' }} onSubmit={handleSubmitNameChange}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '5px', maxWidth: '70%', }}>
-                            <input style={styles.editInput} type="text" name="deviceName" defaultValue={device.name} />
+                            <input style={styles.editInput} type="text" name="deviceName" defaultValue={device.deviceName} />
                         </div>
                         <button style={submitButton} type="submit">Save</button>
                         <button style={cancelButton} type="button" onClick={() => setIsEdit(false)}>Cancel</button>
                     </form>
                 ) : (
-                    <div style={styles.deviceName}>Name: {device.name} <span style={{ cursor: 'pointer' }} onClick={() => setIsEdit(true)}><GoPencil /></span></div>
+                    <div style={styles.deviceName}>Name: {deviceNameState} <span style={{ cursor: 'pointer' }} onClick={() => setIsEdit(true)}><GoPencil /></span></div>
                 )}
-                <div style={styles.devicePlace}>Place: {device.place}</div>
-            </div>
-            <div style={{ marginLeft: 'auto', display: 'flex', flexDirection: 'column' }}>
 
-                <div style={statusColor}>{device.state ? 'Online' : 'Offline'}</div>
-                <div style={{ marginLeft: 'auto', cursor: 'pointer', color: theme.dashboardTheme.roomCardDelete }}><MdOutlineDelete /></div>
+            </div>
+            <div style={{ marginLeft: 'auto', display: 'flex', flexDirection: 'column', justifyContent: "space-around" }}>
+
+                <div style={statusColor}>{device.state}</div>
+                <div style={{ marginLeft: 'auto', cursor: 'pointer', color: theme.dashboardTheme.roomCardDelete, background: "white", border: '1px solid red', borderRadius: '10px', padding: '0px 5px', fontSize: '20px' }}><MdOutlineDelete /></div>
             </div>
         </div>
         <div style={styles.action}>
-            {haveValue &&
-                <div style={styles.value}>
-                    <div style={{ flex: '2' }}>Giá trị hiện tại </div>
-                    <div style={{ flex: '1', fontSize: '1.2rem', fontWeight: 'bold', left: 'auto' }}>{device.value} {device.unit}</div>
-                </div>
-            }
-            <TripleToggle />
+
+            <div style={styles.value}>
+                <div >Giá trị hiện tại </div>
+                <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginLeft: 'auto' }}>{device.value} {device.unit}</div>
+            </div>
+
+            <TripleToggle id={device.deviceId} state={device.onOffState != null ? device.onOffState : 'OFF'} />
         </div>
     </div>
 }
@@ -82,7 +83,7 @@ const styles = {
         background: '#fff',
         borderRadius: '10px',
         overflow: 'hidden',
-        border: 'solid black 1px'
+        border: 'solid #886f61 1px'
     },
     icon: {
         display: 'flex',
@@ -92,7 +93,7 @@ const styles = {
     },
     title: {
         display: 'flex',
-        background: 'rgba(0,0,0,0.1)',
+        background: theme.dashboardTheme.titleInfoCardBg,
         padding: '5px 10px',
 
     },
@@ -102,7 +103,7 @@ const styles = {
         width: '80%',
     },
     status: {
-        color: '#fff',
+
         borderRadius: '8px',
         height: '24px',
         padding: '3px 6px',
@@ -123,19 +124,20 @@ const styles = {
     action: {
         margin: '10px',
         display: 'flex',
+        flexDirection: 'column' as const,
         alignItems: 'center',
         justifyContent: 'center',
 
     },
     value: {
         display: 'flex',
-        width: '70%',
-        background: 'rgba(0,0,0,0.1)',
+        width: '100%',
+        background: theme.dashboardTheme.valueInfoCardBg,
         borderRadius: '10px',
         alignItems: 'center',
         justifyContent: 'center',
         padding: '10px',
-        marginRight: '10px',
+        margin: '10px',
     },
     button: {
         all: 'unset' as const,
@@ -154,6 +156,7 @@ const styles = {
         background: 'rgba(0,0,0,0.2)',
         padding: '3px 10px',
         appearance: 'none' as const,
+        color: 'black',
         border: 'none',
         borderRadius: '5px',
         width: '100%',

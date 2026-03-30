@@ -1,18 +1,47 @@
-import { theme } from "../utils/theme"
-import { type RoomType } from "../schema/room"
+import { theme } from "../../utils/theme"
+import { type RoomType } from "../../schema/room"
 import { GoPencil, GoPlus } from "react-icons/go";
 import { MdOutlineDelete } from "react-icons/md";
 import DeviceInfoCard from "./deviceInfoCard";
 import SensorInfoCard from "./sensorInfoCard";
-import { useRoomInfo } from "../store/useRoomInfo";
-import { useState } from "react";
+import { useRoomInfo } from "../../store/useRoomInfo";
+import { useState, useEffect } from "react";
 import toast from 'react-hot-toast';
+import axiosClient from "../../apis/api";
+import { type DeviceDataType } from "../../schema/device";
+import { type SensorType } from "../../schema/sensor";
+
 export default function RoomCard({ roomData }: { roomData: RoomType }) {
 
     const roomId = roomData.roomId
 
-    const listDevices = roomData.listOfOutputDevices
-    const listSensor = roomData.listOfSensors
+    const [currentRoomName, setCurrentRoomName] = useState(roomData.roomName)
+
+    const [listDevices, setListDevices] = useState<DeviceDataType[]>([]);
+    const [listSensor, setListSensor] = useState<SensorType[]>([]);
+
+    // 2. Fetch the data when the component mounts
+    useEffect(() => {
+        const fetchDevices = async () => {
+            try {
+                // Note: Since your axios interceptor returns response.data, we just await it directly
+                const allDevices: any[] = await axiosClient.get(`/api/rooms/${roomId}/devices`);
+                console.log(allDevices)
+                // 3. The "Mail Sorter": Split them by type
+                const outputs = allDevices.filter((device) => device.type === 'OUTPUT');
+                const sensors = allDevices.filter((device) => device.type === 'SENSOR');
+
+                setListDevices(outputs);
+                setListSensor(sensors);
+
+            } catch (error) {
+                console.error(`Failed to fetch devices for room ${roomId}`, error);
+            }
+        };
+
+        fetchDevices();
+    }, [roomId]);
+
     const [isEdit, setIsEdit] = useState(false)
     const handleEditName = useRoomInfo((s) => s.changeRoomName)
     const submitNameChange = async (e: React.ChangeEvent<HTMLFormElement>) => {
@@ -24,6 +53,7 @@ export default function RoomCard({ roomData }: { roomData: RoomType }) {
 
         const success = await handleEditName(roomId, newName)
         if (success) {
+            setCurrentRoomName(newName)
             setIsEdit(false);
             toast.success("Changed name successfully!")
         }
@@ -60,7 +90,7 @@ export default function RoomCard({ roomData }: { roomData: RoomType }) {
 
                     :
                     <>
-                        <div style={styles.roomName}>{roomData.roomName}</div>
+                        <div style={styles.roomName}>{currentRoomName}</div>
                         <div style={{ cursor: 'pointer', }} onClick={() => setIsEdit(true)}>
                             <GoPencil />
                         </div>
@@ -72,37 +102,39 @@ export default function RoomCard({ roomData }: { roomData: RoomType }) {
             </div>
         </div>
 
-        {listDevices.length > 0 &&
-            <div style={styles.outputDevices}>
-                <div>
-                    Output Devices
+        <div style={styles.listDevicesAndSensors}>
+            {listDevices.length > 0 &&
+                <div style={styles.outputDevices}>
+                    <div>
+                        Output Devices
+                    </div>
+                    <div style={styles.listDevices}>
+                        {listDevices.map(item =>
+                            <DeviceInfoCard
+                                key={item.deviceId}
+                                device={item}
+                                roomId={roomId}
+                            />
+                        )}
+                    </div>
                 </div>
-                <div style={styles.listDevices}>
-                    {listDevices.map(item =>
-                        <DeviceInfoCard
-                            key={item.id}
-                            device={item}
-                            haveValue={true}
-                        />
-                    )}
-                </div>
-            </div>
-        }
+            }
 
-        {listSensor.length > 0 &&
-            <div style={styles.sensors}>
-                <div>Sensors</div>
-                <div style={styles.listSensors}>
-                    {listSensor.map(item =>
-                        <SensorInfoCard
-                            key={item.id}
-                            sensorInfo={item}
-                        />
-                    )}
+            {listSensor.length > 0 &&
+                <div style={styles.sensors}>
+                    <div>Sensors</div>
+                    <div style={styles.listSensors}>
+                        {listSensor.map(item =>
+                            <SensorInfoCard
+                                key={item.deviceId}
+                                sensorInfo={item}
+                            />
+                        )}
 
+                    </div>
                 </div>
-            </div>
-        }
+            }
+        </div>
 
         <div style={styles.addDevices}>
             <div><GoPlus /></div>
@@ -168,12 +200,23 @@ const styles = {
     },
 
     outputDevices: {
-        marginTop: '0px',
+        marginTop: '10px',
     },
 
     sensors: {
         marginTop: '10px',
 
+    },
+
+    listDevicesAndSensors: {
+        display: 'grid',
+        width: '100%',
+        padding: '10px',
+        gridTemplateColumns: 'repeat(2, 1fr)',
+        justifyContent: 'center',
+        alignItems: 'start',
+        gap: '20px',
+        flexDirection: 'row' as const,
     },
 
     listDevices: {

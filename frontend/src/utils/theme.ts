@@ -6,11 +6,15 @@ export const theme = {
     },
     dashboardTheme: {
         roomCardBackground: '#fff',
-        roomCardDelete: '#fa1c1c',
+        roomCardDelete: '#ff0000',
         addDevicesButton: '#4a5569',
-        buttonColor: '#4f39f6',
+        buttonColor: '#bfb9ad',
+        buttonBackgroundColor: '#fef6e8',
+        titleInfoCardBg: '#e3c9ad',
+        valueInfoCardBg: '#faf9f0',
+        addRoomBtn: '#886f61',
     },
     sidebarTheme: {
-        menuCardBg: '#4f39f6',
+        menuCardBg: '#886f61',
     }
 }

@@ -1,23 +1,28 @@
 import * as z from 'zod'
 
-const SensorDataPrime = z.object({
-    id: z.number(),
-    time: z.coerce.date(),
-    value: z.number(),
-})
-
-
 export const SensorInfoObject = z.object({
-    id: z.number(),
-    name: z.string(),
+    deviceId: z.string(),
+    deviceName: z.string(),
     type: z.string(),
-    place: z.string(),
-    sensor_data: SensorDataPrime.nullable(),
-    unit: z.string(),
-    state: z.boolean(),// state current: on / off
-    threshold_min: z.number(),
-    threshold_max: z.number(),
+    feedKey: z.string(),
+    state: z.string(),
+    auto: z.boolean().nullable(),
+    onOffState: z.string().nullable(),
+    thresholdMin: z.number().optional(),
+    thresholdMax: z.number().optional(),
+
 })
+
+export const SensorDataObject = z.object({
+    id: z.string(),
+    sensorDeviceId: z.string(),
+    time: z.string(),
+    value: z.number(),
+    sensor: z.string().nullable(),
+})
+
+export type SensorData = z.infer<typeof SensorDataObject>
+export const SensorDataList = z.array(SensorDataObject)
 
 export type SensorType = z.infer<typeof SensorInfoObject>;
 export const SensorInfoList = z.array(SensorInfoObject)

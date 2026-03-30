@@ -1,6 +1,6 @@
-import '../index.css'
+import '../../index.css'
 import { useState, useEffect } from 'react'
-import { useUserInfoStore } from '../store/useUserStore'
+import { useUserInfoStore } from '../../store/useUserStore'
 
 export default function UserCard() {
 
@@ -22,9 +22,9 @@ export default function UserCard() {
     return (
         <div style={styles.container} >
             <div style={styles.nameContainer}>
-                <div style={styles.userName}> {info.name} </div>
+                <div style={styles.userName}> {info.fullName} </div>
             </div>
-            <div style={profileStyle} onMouseEnter={() => setIsHover(true)} onMouseLeave={() => setIsHover(false)}>{info.name[0].toUpperCase()}</div>
+            <div style={profileStyle} onMouseEnter={() => setIsHover(true)} onMouseLeave={() => setIsHover(false)}>{info.fullName[0].toUpperCase()}</div>
         </div>
     )
 }

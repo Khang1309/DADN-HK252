@@ -1,4 +1,4 @@
-import '../index.css'
+import '../../index.css'
 
 
 export default function TotalCard({ name, total, icon, colorName }: { name: string, total: number, icon: string, colorName: string }) {
@@ -28,10 +28,14 @@ const styles = {
         alignItems: 'center',
         padding: '15px',
         background: '#ffffff',
-        borderRadius: '5px',
+        border: '2px solid #886f61',
+        borderRadius: '10px',
     },
     nameAndIcon: {
         display: 'flex',
+        // background: 'blue',
+        width: '100%',
+        justifyContent: 'space-between',
         alignItems: 'center',
         color: 'inherit',
     },
@@ -47,6 +51,8 @@ const styles = {
         color: 'inherit',
         fontSize: '2em',
         fontWeight: '1000',
+        width: '100%',
+        // background: 'red',
     },
     total: {
         flex: 1,

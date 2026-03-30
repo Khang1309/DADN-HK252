@@ -2,14 +2,15 @@ import * as z from 'zod'
 
 export const DeviceDataObject = z.object(
     {
-        id: z.number(),
-        name: z.string(),
+        deviceId: z.string(),
+        deviceName: z.string(),
+        feedKey: z.string(),
         type: z.string(),
-        place: z.string(),
-        value: z.number(),
-        unit: z.string(),
-        action: z.string(), // User action on, off, auto
-        state: z.boolean(), // state current: on / off, true => on
+        state: z.string(),
+        auto: z.boolean().optional(),
+        onOffState: z.string().optional(),
+        thresholdMin: z.number().optional(),
+        thresholdMax: z.number().optional(),
     }
 )
 

@@ -1,12 +1,12 @@
-import TotalCard from "../components/totalCard"
-import OveralTypeCard from "../components/overalTypeCard"
+import TotalCard from "../components/card/totalCard"
+import OveralTypeCard from "../components/card/overalTypeCard"
 import s from './Home.module.css'
 import { useState, useEffect } from "react"
-import AddRoomButton from "../components/addRoomButton"
+import AddRoomButton from "../components/button/addRoomButton"
 import { useRoomInfo } from "../store/useRoomInfo"
-import RoomCard from "../components/roomCard"
-
-
+import RoomCard from "../components/card/roomCard"
+import toast from "react-hot-toast"
+import { theme } from "../utils/theme"
 export default function Home() {
 
     const rooms = useRoomInfo((state) => state.rooms)
@@ -17,6 +17,28 @@ export default function Home() {
         setPlace(event.target.value)
     }
 
+    const [isAddRoom, setIsAddRoom] = useState(false)
+    const handleAddRoom = useRoomInfo((state) => state.addRoom)
+
+    const submitNameChange = async (e: React.ChangeEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        const formData = new FormData(e.currentTarget);
+        const newName = formData.get("roomName") as string;
+
+
+        const success = await handleAddRoom(newName)
+        if (success) {
+            setIsAddRoom(false);
+            toast.success("Changed name successfully!")
+            fetch()
+        }
+
+        else {
+            setIsAddRoom(false);
+            toast.error("Changed name failed!")
+        }
+    }
 
     useEffect(() => {
         fetch()
@@ -27,20 +49,32 @@ export default function Home() {
             <p className={s.title}>Dashboard</p>
             <p className={s.subTitle}>Tổng quan hệ thống nhà thông minh</p>
             <div className={s.listDevices}>
-                <TotalCard name="Tong thiet bi" total={16} icon="fa-brands fa-chromecast" colorName="black" />
-                <TotalCard name="Dang hoat dong" total={15} icon="fa-solid fa-signal" colorName="green" />
-                <TotalCard name="Ngoai tuyen" total={16} icon="fa-solid fa-eye-low-vision" colorName="red" />
+                <TotalCard name="Tổng thiết bị" total={16} icon="fa-brands fa-chromecast" colorName="black" />
+                <TotalCard name="Đang hoạt động" total={15} icon="fa-solid fa-signal" colorName="green" />
+                <TotalCard name="Ngoại tuyến" total={16} icon="fa-solid fa-eye-low-vision" colorName="red" />
             </div>
 
         </div>
         <div className={s.roomContainer}>
             <div className={s.yourRoom}>
                 <div> Các phòng của bạn</div>
-                <div style={{ marginLeft: 'auto', }}>
+                <div style={{ marginLeft: 'auto', }} onClick={() => setIsAddRoom(true)}>
                     <AddRoomButton />
                 </div>
             </div>
 
+            {isAddRoom &&
+                <div className={s.editNameBox}>
+                    <form style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} onSubmit={submitNameChange}>
+                        <input className={s.editName} type="text" name="roomName" placeholder="Name your room" />
+
+
+                        <button className={s.button} style={{ color: 'white', background: theme.dashboardTheme.buttonColor, }} type="submit" >Save</button >
+                        <button className={s.button} style={{ background: 'rgba(0,0,0,0.2)', }} type="button" onClick={() => setIsAddRoom(false)}>Cancel</button>
+
+                    </form>
+                </div>
+            }
 
             <div className={s.listOfRooms}>
                 {rooms.map((item) => (

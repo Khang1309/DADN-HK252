@@ -1,60 +1,20 @@
 import { create } from "zustand";
 import axiosClient from "../apis/api";
-import { type SensorType, SensorInfoList } from "../schema/sensor";
+import { type SensorType, SensorInfoList, type SensorData, SensorDataList } from "../schema/sensor";
 
 interface SensorStore {
     sensors: SensorType[],
+    sensorData: SensorData[],
     fetchSensors: () => Promise<void>,
-    changeSensorName: (id: number, newName: string) => Promise<boolean>,
+    changeSensorName: (id: string, newName: string) => Promise<boolean>,
+    getSensorData: (id: string) => Promise<void>,
 }
-
-const mockSensors: SensorType[] = [
-    {
-        id: 1,
-        name: 'Living sensor Temp',
-        type: 'temperature',
-        place: 'Living sensor',
-        unit: '°C',
-        state: true,
-        threshold_min: 16,
-        threshold_max: 32,
-        sensor_data:
-
-            { id: 103, time: new Date('2026-03-22T10:00:00Z'), value: 24.8 },
-
-    },
-    {
-        id: 2,
-        name: 'Bathsensor Humidity',
-        type: 'humidity',
-        place: 'Bathsensor',
-        unit: '%',
-        state: true,
-        threshold_min: 30,
-        threshold_max: 65,
-        sensor_data:
-            { id: 201, time: new Date('2026-03-22T09:30:00Z'), value: 55 },
-        // Someone took a shower!
-
-    },
-    {
-        id: 3,
-        name: 'Garage Door Sensor',
-        type: 'contact',
-        place: 'Garage',
-        unit: 'binary',
-        state: false, // Currently off/closed
-        threshold_min: 0,
-        threshold_max: 1,
-
-        sensor_data: null
-    }
-];
 
 
 
 export const useSensorInfo = create<SensorStore>((set) => ({
-    sensors: mockSensors,
+    sensors: [],
+    sensorData: [],
 
     fetchSensors: async () => {
         try {
@@ -67,7 +27,7 @@ export const useSensorInfo = create<SensorStore>((set) => ({
             console.log(`Error getting sensor data ${err}`)
         }
     },
-    changeSensorName: async (id: number, newName: string) => {
+    changeSensorName: async (id: string, newName: string) => {
         try {
             // const response = await axiosClient.put("", newName);
             // if (!response.data) { return false; }
@@ -82,6 +42,18 @@ export const useSensorInfo = create<SensorStore>((set) => ({
         } catch (error) {
             console.log(`Error changing sensor name ${error}`)
             return false;
+        }
+    },
+    getSensorData: async (id: string) => {
+        try {
+            const data = await axiosClient.get(`/api/devices/${id}/data`)
+            console.log(data, 'aaaaa')
+            const value = SensorDataList.parse(data)
+
+            set({ sensorData: value })
+
+        } catch (error) {
+
         }
     }
 }))
