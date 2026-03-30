@@ -68,7 +68,7 @@ export default function DeviceInfoCard({ device, roomId }: { device: DeviceDataT
 
             <div style={styles.value}>
                 <div >Giá trị hiện tại </div>
-                <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginLeft: 'auto' }}>{device.value} {device.unit}</div>
+                <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginLeft: 'auto' }}>{/*{device.value} {device.unit}*/}</div>
             </div>
 
             <TripleToggle id={device.deviceId} state={device.onOffState != null ? device.onOffState : 'OFF'} />
