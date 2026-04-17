@@ -8,12 +8,20 @@
 }
 
 .container {
+    min-width: 70vw;
+    min-height: 85vh;
     border-radius: 10px;
-    padding: 10px;
+    padding: 20px;
+    display: flex;
+    transition: all 0.4s ease-in-out 0.2s;
+    justify-content: center;
+    align-items: center;
 }
 
 .slider {
     flex: 1;
+    display: flex;
+    align-items: center;
 }
 
 .content {
@@ -29,6 +37,11 @@
 .subtitle {
     font-size: 0.8rem;
     margin-bottom: 30px;
+}
+
+.subtitle>span {
+    color: blue;
+    cursor: pointer;
 }
 
 .content form>div {
@@ -83,10 +96,12 @@
     padding: 10px;
     cursor: pointer;
     border-radius: 8px;
+    margin-bottom: 15px;
 }
 
 .content button[type="submit"]:hover {
     background: rgba(255, 255, 255, 0.1);
+
 }
 
 .content button[type="submit"]:active {

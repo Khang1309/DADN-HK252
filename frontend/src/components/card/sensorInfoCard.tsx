@@ -1,55 +1,54 @@
-import { type SensorType } from "../../schema/sensor"
+import { useEffect, useState } from "react";
 import { GoPencil } from "react-icons/go";
+import toast from "react-hot-toast";
+
+
+import { type SensorType } from "../../schema/sensor"
 import { MdOutlineDelete } from "react-icons/md";
 import { theme } from "../../utils/theme";
-import { useEffect, useState } from "react";
-import { useSensorInfo } from "../../store/useSensorInfo";
+import { useDevicesStore } from "../../store/useDevicesStore";
+import Modal from "../Modal";
+import InputNumber from "../InputNumber";
 
-import toast from "react-hot-toast";
-import axiosClient from "../../apis/api";
+export default function SensorInfoCard({ sensorInfo, roomId }: { sensorInfo: SensorType, roomId: string }) {
+    const sensor = useDevicesStore((s) => (s.listOfSensor[roomId].find(sens => sens.deviceId == sensorInfo.deviceId)))
+    const editName = useDevicesStore(s => s.updateNameSensor)
+    const deleteSensor = useDevicesStore(s => s.deleteSensor)
+    const changeSensorValue = useDevicesStore(s => s.updateValueSensor)
 
-
-export default function SensorInfoCard({ sensorInfo }: { sensorInfo: SensorType }) {
-    const editName = useSensorInfo((s) => s.changeSensorName)
-    const getInfoValue = useSensorInfo((s) => s.getSensorData)
-    const sensorData = useSensorInfo((s) => s.sensorData)
     const [isEdit, setIsEdit] = useState(false);
-    const latestData = sensorData?.length > 0 ? sensorData[sensorData.length - 1] : null;
+    const latestData = sensor ? sensor.data[sensor.data.length - 1] : null;
     const statusColor = {
         ...styles.status, background: sensorInfo.state ? '#86f9a8' : '#ff6666'
     }
-    useEffect(() => {
-        // 1. Fetch immediately when the component first loads
-        getInfoValue(sensorInfo.deviceId);
 
-        // 2. Set up a timer to fetch again every 10 seconds (10000 milliseconds)
-        const intervalId = setInterval(() => {
-            getInfoValue(sensorInfo.deviceId);
-        }, 10000);
-
-        // 3. Cleanup function: This runs when the component unmounts 
-        // (like when you navigate to a different page) to destroy the timer.
-        return () => clearInterval(intervalId);
-
-    }, [getInfoValue, sensorInfo.deviceId]);
+    const [isDelete, setIsDelete] = useState(false)
+    const handleDelete = async () => {
+        deleteSensor(sensorInfo.deviceId, roomId)
+    }
 
     const handleSubmitNameChange = async (e: React.ChangeEvent<HTMLFormElement>) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
         const newName = formData.get("sensorName") as string;
 
-
-        const success = await editName(sensorInfo.deviceId, newName)
-        if (success) {
-
+        try {
+            await editName(roomId, newName, sensorInfo.deviceId)
             toast.success("Changed name successfully!")
+            setIsEdit(false);
+
+        } catch (error) {
+            toast.error("Changed name failed!")
+
+            setIsEdit(false);
         }
 
-        else {
-            toast.error("Changed name failed!")
-        }
-        setIsEdit(false);
     }
+
+    const [isEditValue, setIsEditValue] = useState(false);
+    const [valueMin, setValueMin] = useState(sensorInfo.thresholdMin || 0)
+
+    const [valueMax, setValueMax] = useState(sensorInfo.thresholdMax || 100)
 
     const submitButton = {
         ...styles.button,
@@ -62,11 +61,21 @@ export default function SensorInfoCard({ sensorInfo }: { sensorInfo: SensorType 
     }
 
     return <div style={styles.container}>
+        <Modal isOpen={isDelete} setIsOpen={setIsDelete} onConfirm={handleDelete} >
+            {
+                <div>
+                    <div style={{ fontSize: '1.3em', fontWeight: '600' }}>Delete Sensor</div>
+                    <div>
+                        Do you want to delete {sensorInfo.deviceName}
+                    </div>
+                </div>
+            }
+        </Modal>
         <div style={styles.title}>
             <div style={styles.name}>
                 {isEdit ? (
                     <form style={{ display: 'flex', alignItems: 'center', gap: '5px' }} onSubmit={handleSubmitNameChange}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '5px', maxWidth: '70%', }}>
                             <input style={styles.editInput} type="text" name="sensorName" defaultValue={sensorInfo.deviceName} />
                         </div>
                         <button style={submitButton} type="submit">Save</button>
@@ -78,26 +87,49 @@ export default function SensorInfoCard({ sensorInfo }: { sensorInfo: SensorType 
             </div>
             <div style={{ marginLeft: 'auto', display: 'flex', flexDirection: 'column', justifyContent: 'space-around' }}>
                 <div style={statusColor}>{sensorInfo.state}</div>
-                <div style={{ marginLeft: 'auto', cursor: 'pointer', color: theme.dashboardTheme.roomCardDelete, background: "white", border: '1px solid red', borderRadius: '10px', padding: '0px 5px', fontSize: '20px' }}><MdOutlineDelete /></div>
+                <div style={{ marginLeft: 'auto', cursor: 'pointer', color: theme.dashboardTheme.roomCardDelete, background: "white", border: '1px solid red', borderRadius: '10px', padding: '0px 5px', fontSize: '20px' }}>
+                    <MdOutlineDelete onClick={() => setIsDelete(true)} /></div>
             </div>
         </div>
         <div style={styles.action}>
             <div style={styles.value}>
                 <div>Giá trị hiện tại </div>
                 <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginLeft: 'auto' }}>
-                    {latestData?.value !== undefined ? latestData.value : "Loading..."}
+                    {latestData?.value !== undefined ? (latestData.value * 0.1).toFixed(1) + "C" : "Loading..."}
                 </div>
             </div>
             <div style={styles.thresholds}>
                 <div style={styles.minThres}>
                     <div>Min</div>
-                    <input style={styles.thresValue} defaultValue={sensorInfo.thresholdMin}></input>
+                    <InputNumber initValue={valueMin} isEdit={isEditValue} setValue={setValueMin} />
                 </div>
                 <div>-</div>
                 <div style={styles.maxThres}>
-                    <input style={styles.thresValue} defaultValue={sensorInfo.thresholdMax}></input>
+                    <InputNumber initValue={valueMax} isEdit={isEditValue} setValue={setValueMax} />
                     <div>Max</div>
                 </div>
+                {isEditValue ?
+                    <div style={{ display: 'flex' }}>
+                        <button style={submitButton} type="button" onClick={async () => {
+                            try {
+                                await changeSensorValue(roomId, sensorInfo.deviceId, valueMin, valueMax)
+                                toast.success("Threshold updated successfully!")
+                                setIsEditValue(false);
+                            } catch (error) {
+                                toast.error("Failed to update threshold!")
+                            }
+                        }}>Save</button>
+                        <button style={cancelButton} type="button" onClick={() => {
+                            setValueMin(sensorInfo.thresholdMin || 0)
+                            setValueMax(sensorInfo.thresholdMax || 100)
+                            setIsEditValue(false)
+                        }}>Cancel</button>
+                    </div>
+                    :
+                    <span style={{ cursor: 'pointer' }} onClick={() => setIsEditValue(true)}><GoPencil /></span>
+
+                }
+
             </div>
         </div>
     </div>
@@ -120,7 +152,7 @@ const styles = {
     name: {
         display: 'flex',
         flexDirection: 'column' as const,
-        width: '80%',
+        width: '70%',
     },
     status: {
         borderRadius: '8px',
@@ -159,7 +191,7 @@ const styles = {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        width: '40%',
+
     },
     minThres: {
         display: 'flex',
@@ -192,6 +224,7 @@ const styles = {
         cursor: 'pointer',
         outline: 'inherit' as const,
         borderRadius: '10px',
+        margin: '3px',
     },
     editInput: {
         fontSize: '1.3em',
@@ -199,7 +232,9 @@ const styles = {
         background: 'rgba(0,0,0,0.2)',
         padding: '3px 10px',
         appearance: 'none' as const,
+        color: 'black',
         border: 'none',
         borderRadius: '5px',
+        width: '100%',
     }
 }

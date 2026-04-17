@@ -2,7 +2,7 @@ import s from './SideBar.module.css'
 import MenuCard from '../components/card/menuCard'
 
 import { theme } from '../utils/theme';
-type menuType = "Dashboard" | "OutputDevices" | "Sensor" | "History";
+type menuType = "Dashboard" | "Chart" | "History";
 
 interface CardData {
     index: number,
@@ -13,6 +13,7 @@ interface CardData {
 const menuCardList: CardData[] = [
     { index: 1, icon: "fa-solid fa-house", name: "Dashboard" },
 
+    { index: 2, icon: "fa-solid fa-history", name: "Chart" },
     { index: 3, icon: "fa-solid fa-history", name: "History" },
 ];
 

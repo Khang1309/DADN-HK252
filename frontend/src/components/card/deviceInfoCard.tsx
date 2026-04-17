@@ -1,35 +1,40 @@
+import { useState } from "react";
+import toast from "react-hot-toast";
+
+import Modal from "../Modal";
 import TripleToggle from "../button/toggleButton";
-import { type DeviceDataType } from '../../schema/device';
+import { type DeviceType } from '../../schema/device';
 import { GoPencil } from "react-icons/go";
 import { MdOutlineDelete } from "react-icons/md";
 import { theme } from "../../utils/theme";
-import { useState } from "react";
-import { useDeviceStore } from "../../store/useDeviceInfo";
-import toast from "react-hot-toast";
-export default function DeviceInfoCard({ device, roomId }: { device: DeviceDataType, roomId: string }) {
-    const editName = useDeviceStore((s) => s.changeDeviceName)
+import { useDevicesStore } from "../../store/useDevicesStore";
+export default function DeviceInfoCard({ device, roomId }: { device: DeviceType, roomId: string }) {
+    const editName = useDevicesStore((s) => s.updateNameOutput)
     const [deviceNameState, setDeviceName] = useState(device.deviceName)
+    const deleteDevice = useDevicesStore(s => s.deleteOutput)
     const [isEdit, setIsEdit] = useState(false);
-
+    const [isDelete, setIsDelete] = useState(false)
     const statusColor = {
         ...styles.status, background: device.state === 'CONNECTED' ? '#86f9a8' : '#ff6666'
+    }
+
+    const handleDelete = async () => {
+        await deleteDevice(device.deviceId, roomId)
     }
 
     const handleSubmitNameChange = async (e: React.ChangeEvent<HTMLFormElement>) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
         const newName = formData.get("deviceName") as string;
-
-        const success = await editName(device.deviceId, newName, roomId)
-        if (success) {
+        try {
+            await editName(device.deviceId, newName, roomId)
             setDeviceName(newName)
             toast.success("Changed name successfully!")
-        }
-
-        else {
+            setIsEdit(false);
+        } catch (error) {
             toast.error("Changed name failed!")
+            setIsEdit(false);
         }
-        setIsEdit(false);
     }
 
     const submitButton = {
@@ -43,6 +48,16 @@ export default function DeviceInfoCard({ device, roomId }: { device: DeviceDataT
     }
 
     return <div style={styles.container}>
+        <Modal isOpen={isDelete} setIsOpen={setIsDelete} onConfirm={handleDelete} >
+            {
+                <div>
+                    <div style={{ fontSize: '1.3em', fontWeight: '600' }}>Delete Sensor</div>
+                    <div>
+                        Do you want to delete {device.deviceName}
+                    </div>
+                </div>
+            }
+        </Modal>
         <div style={styles.title}>
             <div style={styles.name}>
                 {isEdit ? (
@@ -61,7 +76,8 @@ export default function DeviceInfoCard({ device, roomId }: { device: DeviceDataT
             <div style={{ marginLeft: 'auto', display: 'flex', flexDirection: 'column', justifyContent: "space-around" }}>
 
                 <div style={statusColor}>{device.state}</div>
-                <div style={{ marginLeft: 'auto', cursor: 'pointer', color: theme.dashboardTheme.roomCardDelete, background: "white", border: '1px solid red', borderRadius: '10px', padding: '0px 5px', fontSize: '20px' }}><MdOutlineDelete /></div>
+                <div style={{ marginLeft: 'auto', cursor: 'pointer', color: theme.dashboardTheme.roomCardDelete, background: "white", border: '1px solid red', borderRadius: '10px', padding: '0px 5px', fontSize: '20px' }}>
+                    <MdOutlineDelete onClick={() => setIsDelete(true)} /></div>
             </div>
         </div>
         <div style={styles.action}>
@@ -100,7 +116,7 @@ const styles = {
     name: {
         display: 'flex',
         flexDirection: 'column' as const,
-        width: '80%',
+        width: '70%',
     },
     status: {
 

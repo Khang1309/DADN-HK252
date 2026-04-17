@@ -1,16 +1,25 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware';
 
 interface menuType {
-    currentTab: "Dashboard" | "OutputDevices" | "Sensor" | "History";
-    setTab: (nextTab: "Dashboard" | "OutputDevices" | "Sensor" | "History") => void
+    currentTab: "Dashboard" | "Chart" | "History";
+    setTab: (nextTab: "Dashboard" | "Chart" | "History") => void
     reloadTab: () => void
 }
 
-const useMenuState = create<menuType>((set) => ({
-    currentTab: "Dashboard",
-    setTab: (nextTab) => set({ currentTab: nextTab }),
-    reloadTab: () => set({ currentTab: "Dashboard" })
-}))
+const useMenuState = create<menuType>()(
+    persist(
+        (set) => ({
+
+            currentTab: "Dashboard",
+            setTab: (nextTab) => set({ currentTab: nextTab }),
+            reloadTab: () => set({ currentTab: "Dashboard" })
+        }),
+        {
+            name: "menu-tab-storage",
+        }
+    )
+)
 
 
 export default useMenuState

@@ -7,40 +7,32 @@ import SensorInfoCard from "./sensorInfoCard";
 import { useRoomInfo } from "../../store/useRoomInfo";
 import { useState, useEffect } from "react";
 import toast from 'react-hot-toast';
-import axiosClient from "../../apis/api";
-import { type DeviceDataType } from "../../schema/device";
-import { type SensorType } from "../../schema/sensor";
+import { useDevicesStore } from "../../store/useDevicesStore";
+import Modal from "../Modal";
+import AddDeviceForm from "../AddDeviceForm";
 
 export default function RoomCard({ roomData }: { roomData: RoomType }) {
 
     const roomId = roomData.roomId
-
     const [currentRoomName, setCurrentRoomName] = useState(roomData.roomName)
 
-    const [listDevices, setListDevices] = useState<DeviceDataType[]>([]);
-    const [listSensor, setListSensor] = useState<SensorType[]>([]);
+    const fetchDevices = useDevicesStore(s => s.fetchDevices)
+    const listDevices = useDevicesStore(s => s.listOfOutput[roomData.roomId])
+    const listSensor = useDevicesStore(s => s.listOfSensor[roomData.roomId])
 
-    // 2. Fetch the data when the component mounts
+    const addOutput = useDevicesStore(s=>s.addOutput)
+    const addSensor = useDevicesStore(s=>s.addSensor)
+
+    const deleteRoom = useRoomInfo(s => s.deleteRoom)
+
+    const handleDelete = async () => {
+        await deleteRoom(roomId)
+    }
     useEffect(() => {
-        const fetchDevices = async () => {
-            try {
-                // Note: Since your axios interceptor returns response.data, we just await it directly
-                const allDevices: any[] = await axiosClient.get(`/api/rooms/${roomId}/devices`);
-                console.log(allDevices)
-                // 3. The "Mail Sorter": Split them by type
-                const outputs = allDevices.filter((device) => device.type === 'OUTPUT');
-                const sensors = allDevices.filter((device) => device.type === 'SENSOR');
-
-                setListDevices(outputs);
-                setListSensor(sensors);
-
-            } catch (error) {
-                console.error(`Failed to fetch devices for room ${roomId}`, error);
-            }
-        };
-
         fetchDevices();
     }, [roomId]);
+
+    const [isDelete, setIsDelete] = useState(false)
 
     const [isEdit, setIsEdit] = useState(false)
     const handleEditName = useRoomInfo((s) => s.changeRoomName)
@@ -49,7 +41,6 @@ export default function RoomCard({ roomData }: { roomData: RoomType }) {
 
         const formData = new FormData(e.currentTarget);
         const newName = formData.get("roomName") as string;
-
 
         const success = await handleEditName(roomId, newName)
         if (success) {
@@ -64,6 +55,8 @@ export default function RoomCard({ roomData }: { roomData: RoomType }) {
         }
     }
 
+    const [isAddDevice, setIsAddDevice] = useState(false)
+
     const submitButton = {
         ...styles.button,
         color: 'white',
@@ -74,8 +67,27 @@ export default function RoomCard({ roomData }: { roomData: RoomType }) {
         background: 'rgba(0,0,0,0.2)',
     }
 
-
     return <div style={styles.container}>
+        <Modal isOpen={isDelete} setIsOpen={setIsDelete} onConfirm={handleDelete} >
+            {
+                <div>
+                    <div style={{ fontSize: '1.3em', fontWeight: '600' }}>Delete Room</div>
+                    <div>
+                        Do you want to delete {roomData.roomName}
+                    </div>
+                </div>
+            }
+        </Modal>
+
+<Modal isOpen={isAddDevice} setIsOpen={setIsAddDevice}>
+            <AddDeviceForm 
+                roomId={roomId}
+                onAddOutput={addOutput}
+                onAddSensor={addSensor}
+                onClose={() => setIsAddDevice(false)}
+            />
+        </Modal>
+
         <div style={styles.header}>
             <div style={styles.nameContainer}>
                 {isEdit ? <>
@@ -98,12 +110,12 @@ export default function RoomCard({ roomData }: { roomData: RoomType }) {
                 }
             </div>
             <div style={{ marginLeft: 'auto', fontSize: '1.5em', cursor: 'pointer', color: theme.dashboardTheme.roomCardDelete }}>
-                <MdOutlineDelete />
+                <MdOutlineDelete onClick={() => setIsDelete(true)} />
             </div>
         </div>
 
         <div style={styles.listDevicesAndSensors}>
-            {listDevices.length > 0 &&
+            {listDevices?.length > 0 &&
                 <div style={styles.outputDevices}>
                     <div>
                         Output Devices
@@ -120,7 +132,7 @@ export default function RoomCard({ roomData }: { roomData: RoomType }) {
                 </div>
             }
 
-            {listSensor.length > 0 &&
+            {listSensor?.length > 0 &&
                 <div style={styles.sensors}>
                     <div>Sensors</div>
                     <div style={styles.listSensors}>
@@ -128,6 +140,7 @@ export default function RoomCard({ roomData }: { roomData: RoomType }) {
                             <SensorInfoCard
                                 key={item.deviceId}
                                 sensorInfo={item}
+                                roomId={roomData.roomId}
                             />
                         )}
 
@@ -136,7 +149,7 @@ export default function RoomCard({ roomData }: { roomData: RoomType }) {
             }
         </div>
 
-        <div style={styles.addDevices}>
+        <div style={styles.addDevices} onClick={() => setIsAddDevice(true)}>
             <div><GoPlus /></div>
             <div>Add devices/sensors</div>
         </div>
@@ -241,7 +254,7 @@ const styles = {
         alignItems: 'center',
         justifyContent: 'center',
         padding: '20px',
-        marginTop: '10px',
+        margin: '10px 10px 0px 10px',
         borderRadius: '15px',
         border: `1px dashed ${theme.dashboardTheme.addDevicesButton}`,
         cursor: 'pointer',

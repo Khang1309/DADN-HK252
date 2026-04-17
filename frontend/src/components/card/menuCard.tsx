@@ -1,10 +1,11 @@
-import '../../index.css'
-import { useState } from 'react'
-import useMenuState from '../../store/useMenuState'
 import { useNavigate } from 'react-router';
+import { useState } from 'react'
+
+import '../../index.css'
+import useMenuState from '../../store/useMenuState'
 import { theme } from '../../utils/theme';
 
-type menuType = "Dashboard" | "OutputDevices" | "Sensor" | "History";
+type menuType = "Dashboard" | "Chart" | "History";
 
 
 export default function MenuCard({ icon, name }: { icon: string, name: menuType }) {

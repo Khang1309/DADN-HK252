@@ -1,6 +1,6 @@
 import * as z from 'zod'
 
-export const DeviceDataObject = z.object(
+export const DeviceObject = z.object(
     {
         deviceId: z.string(),
         deviceName: z.string(),
@@ -14,5 +14,5 @@ export const DeviceDataObject = z.object(
     }
 )
 
-export type DeviceDataType = z.infer<typeof DeviceDataObject>
-export const DeviceDataList = z.array(DeviceDataObject)
+export type DeviceType = z.infer<typeof DeviceObject>
+export const DeviceList = z.array(DeviceObject)

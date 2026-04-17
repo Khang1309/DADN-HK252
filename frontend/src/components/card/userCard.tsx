@@ -4,12 +4,8 @@ import { useUserInfoStore } from '../../store/useUserStore'
 
 export default function UserCard() {
 
-    const { info, isLoading, err, fetchUserInfo } = useUserInfoStore()
+    const { info, isLoading, err } = useUserInfoStore()
     const [isHover, setIsHover] = useState(false)
-
-    useEffect(() => {
-        fetchUserInfo()
-    }, [fetchUserInfo])
 
     if (isLoading) return <div>Loading user info...</div>;
     if (err) return <div className="text-red-500">{err}</div>;

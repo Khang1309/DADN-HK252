@@ -4,8 +4,7 @@ import MainLayout from '../layout/MainLayout';
 
 import Home from '../pages/Home';
 import Login from '../pages/Login';
-import OutputDevices from '../pages/OutputDevices';
-import Sensor from '../pages/Sensor';
+import Chart from '../pages/Chart'
 import History from '../pages/History';
 
 export const router = createBrowserRouter([
@@ -16,8 +15,7 @@ export const router = createBrowserRouter([
         children: [
             { index: true, element: <Home /> },           // URL: /
             { path: "dashboard", element: <Home /> },    // URL: /dashboard
-            { path: "outputdevices", element: <OutputDevices /> }, // URL: /output
-            { path: "sensor", element: <Sensor /> },     // URL: /sensor
+            { path: "chart", element: <Chart /> },
             { path: "history", element: <History /> },   // URL: /history
         ]
     },

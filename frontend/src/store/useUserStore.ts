@@ -1,40 +1,105 @@
 import { create } from "zustand";
-import { type UserInfoType, UserInfo } from "../schema/user";
+import { getCookie, setCookie, removeCookie } from 'typescript-cookie'
+
+import { type UserInfoType } from "../schema/user";
+import { persist, createJSONStorage, type StateStorage } from 'zustand/middleware';
 import axiosClient from "../apis/api";
 
+const EXPIRED_TIME = 1;
 
 interface UserInfoState {
     info: UserInfoType | null,
     isLoading: boolean,
     err: string | null,
-    fetchUserInfo: () => Promise<void>
+    setError: (err: string | null) => void
+    login: (email: string, password: string) => Promise<void>
+    register: (email: string, password: string, fullname: string) => Promise<void>
+    logout: () => Promise<void>
 }
 
-const mock: UserInfoType = {
-    fullName: "Khang",
-    token: "",
-    email: "",
+
+const cookieStorage: StateStorage = {
+    getItem: (name: string) => getCookie(name) ?? null,
+    setItem: (name: string, value: string) => setCookie(name, value, { expires: EXPIRED_TIME }), //1 day
+    removeItem: (name: string) => removeCookie(name),
 }
 
-export const useUserInfoStore = create<UserInfoState>((set) => ({
-    info: mock,
-    isLoading: false,
-    err: null,
 
-    fetchUserInfo: async () => {
-        set({ isLoading: true, err: null });
-        try {
+export const useUserInfoStore = create<UserInfoState>()(
+    persist((set) => ({
+        info: null,
+        isLoading: false,
+        err: null,
 
-            // const rawData = await axiosClient.get("/user")
-            // const data = UserInfo.parse(rawData.data)
-            // set({ info: data })
+        setError: (err) => {
+            set({ err: err })
+        },
 
-            set({ isLoading: false });
+        login: async (email: string, password: string) => {
+            set({ isLoading: true, err: null });
+            try {
+
+                const data = await axiosClient.post("/api/Auth/login", { email: email, password: password })
+
+                set({
+                    info: data as unknown as UserInfoType,
+                    isLoading: false
+                });
+            }
+            catch (errs: any) {
+                const errorMessage = errs?.response?.data?.message || errs?.message || "An unknown error occurred";
+
+                set({
+                    err: `Failed to login: ${errorMessage}`,
+                    isLoading: false
+                });
+
+                console.log(errs);
+            }
+        },
+        register: async (email: string, password, fullname: string) => {
+            set({ isLoading: true, err: null });
+            try {
+
+                const data = await axiosClient.post("/api/Auth/register", { email: email, password: password, fullName: fullname })
+
+                set({
+                    info: data as unknown as UserInfoType,
+                    isLoading: false
+                });
+            }
+            catch (errs: any) {
+
+                const errorMessage = errs?.response?.data?.message || errs?.message || "An unknown error occurred";
+
+                set({
+                    err: `Failed to register: ${errorMessage}`,
+                    isLoading: false
+                });
+
+                console.log(errs);
+            }
+
+        },
+        logout: async () => {
+            try {
+                set({ info: null })
+            } catch (errs: any) {
+                const errorMessage = errs?.response?.data?.message || errs?.message || "An unknown error occurred";
+
+                set({
+                    err: `Failed to log out: ${errorMessage}`,
+                    isLoading: false
+                });
+
+            }
         }
-        catch (errs) {
-            set({ err: `Fail to load device ${errs}`, isLoading: false })
-            console.log(errs)
+    }),
+        {
+            name: 'user-storage',
+            storage: createJSONStorage(() => cookieStorage)
         }
-    }
 
-}))
+    )
+
+)
