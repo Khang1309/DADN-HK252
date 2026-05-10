@@ -117,6 +117,11 @@ export default function DeviceCard({ device, roomId }: DeviceCardProps) {
               )}
             </div>
             <div className="flex items-center gap-2 ml-2">
+              {device.auto && (
+                <Badge variant="secondary" className="bg-blue-100 text-blue-700 hover:bg-blue-100 animate-pulse border-blue-200">
+                  AUTO
+                </Badge>
+              )}
               <Badge variant={device.state === 'CONNECTED' ? 'success' : 'destructive'}>
                 {device.state}
               </Badge>
@@ -139,6 +144,7 @@ export default function DeviceCard({ device, roomId }: DeviceCardProps) {
               <TripleToggle
                 id={device.deviceId}
                 state={device.onOffState ?? 'OFF'}
+                auto={device.auto ?? false}
               />
             </div>
           </CardContent>

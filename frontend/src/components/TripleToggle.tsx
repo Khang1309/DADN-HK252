@@ -7,25 +7,37 @@ import { useDevicesStore } from '@/store/useDevicesStore'
 interface TripleToggleProps {
   id: string
   state: string
+  auto: boolean
 }
 
 const STATES = ['ON', 'OFF', 'AUTO'] as const
 
-export default function TripleToggle({ id, state }: TripleToggleProps) {
+export default function TripleToggle({ id, state, auto }: TripleToggleProps) {
   const [isChecked, setIsChecked] = useState(state)
   const fetchDevices = useDevicesStore((s) => s.fetchDevices)
 
-  // Sync internal state when prop 'state' changes (e.g., from polling)
+  // Sync internal state when prop 'state' or 'auto' changes (e.g., from polling or control)
   useEffect(() => {
     setIsChecked(state)
-  }, [state])
+  }, [state, auto])
 
   const handleToggle = async (newState: string) => {
     try {
       // Optimistic update
       setIsChecked(newState)
+      
       await axiosClient.post(`/api/devices/${id}/control`, { status: newState })
-      await fetchDevices()
+      
+      // If switching to AUTO, or even manually toggling, wait a bit then refresh 
+      // to get the actual state from backend (especially important for AUTO mode)
+      if (newState === 'AUTO' || auto) {
+        setTimeout(async () => {
+          await fetchDevices()
+        }, 500)
+      } else {
+        await fetchDevices()
+      }
+      
     } catch (error) {
       console.error(`Failed to set device to ${newState}:`, error)
       // Revert if error
