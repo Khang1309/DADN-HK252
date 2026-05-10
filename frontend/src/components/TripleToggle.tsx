@@ -14,34 +14,43 @@ const STATES = ['ON', 'OFF', 'AUTO'] as const
 
 export default function TripleToggle({ id, state, auto }: TripleToggleProps) {
   const [isChecked, setIsChecked] = useState(state)
+  const [isSyncing, setIsSyncing] = useState(false)
   const fetchDevices = useDevicesStore((s) => s.fetchDevices)
 
-  // Sync internal state when prop 'state' or 'auto' changes (e.g., from polling or control)
+  // Sync internal state when prop 'state', 'auto' changes, or when syncing finishes
   useEffect(() => {
-    setIsChecked(state)
-  }, [state, auto])
+    if (!isSyncing) {
+      setIsChecked(state)
+    }
+  }, [state, auto, isSyncing])
 
   const handleToggle = async (newState: string) => {
     try {
       // Optimistic update
       setIsChecked(newState)
+
+      if (newState === 'AUTO') {
+        setIsSyncing(true)
+      }
       
       await axiosClient.post(`/api/devices/${id}/control`, { status: newState })
       
-      // If switching to AUTO, or even manually toggling, wait a bit then refresh 
-      // to get the actual state from backend (especially important for AUTO mode)
+      // If switching to AUTO, or even manually toggling while in auto, wait a bit then refresh 
       if (newState === 'AUTO' || auto) {
         setTimeout(async () => {
           await fetchDevices()
+          setIsSyncing(false) // Trigger re-sync from props
         }, 500)
       } else {
         await fetchDevices()
+        setIsSyncing(false)
       }
       
     } catch (error) {
       console.error(`Failed to set device to ${newState}:`, error)
       // Revert if error
       setIsChecked(state)
+      setIsSyncing(false)
     }
   }
 
