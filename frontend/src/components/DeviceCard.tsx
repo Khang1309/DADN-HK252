@@ -133,7 +133,7 @@ export default function DeviceCard({ device, roomId }: DeviceCardProps) {
           <CardContent className="p-4 space-y-3">
             <div className="flex items-center justify-between rounded-lg bg-muted/30 px-3 py-2">
               <span className="text-sm text-muted-foreground">Current Value</span>
-              <span className="text-sm font-bold">{device.onOffState ?? 'OFF'}</span>
+              <span className="text-sm font-bold">{device.currentValue ?? 0}</span>
             </div>
             <div className="flex justify-center">
               <TripleToggle

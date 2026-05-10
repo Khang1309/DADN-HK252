@@ -20,6 +20,7 @@ export const SensorObject = z.object({
     state: z.string(),
     auto: z.boolean().nullable(),
     onOffState: z.string().nullable(),
+    currentValue: z.number().optional().nullable(),
     thresholdMin: z.number().optional(),
     thresholdMax: z.number().optional(),
     data: SensorDataList,

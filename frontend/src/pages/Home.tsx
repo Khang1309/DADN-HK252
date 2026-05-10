@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Radio, Signal, Plus } from 'lucide-react'
 import toast from 'react-hot-toast'
@@ -23,6 +23,14 @@ export default function Home() {
 
   const listOfOutput = useDevicesStore((state) => state.listOfOutput)
   const listOfSensor = useDevicesStore((state) => state.listOfSensor)
+  const fetchDevices = useDevicesStore((state) => state.fetchDevices)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchDevices()
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [fetchDevices])
 
   const numberOfDevices = Object.values(listOfOutput).reduce((total, list) => total + list.length, 0)
   const numberOfSensors = Object.values(listOfSensor).reduce((total, list) => total + list.length, 0)

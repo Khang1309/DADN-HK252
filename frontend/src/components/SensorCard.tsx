@@ -144,7 +144,7 @@ export default function SensorCard({ sensorInfo, roomId }: SensorCardProps) {
               <span className="text-sm text-muted-foreground">Current Value</span>
               <span className="text-sm font-bold">
                 {latestData?.value !== undefined
-                  ? `${(latestData.value * 0.1).toFixed(1)}°C`
+                  ? latestData.value
                   : 'Loading...'}
               </span>
             </div>
