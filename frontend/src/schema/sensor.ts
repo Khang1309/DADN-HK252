@@ -1,11 +1,12 @@
 import * as z from 'zod'
 
 const SensorDataObject = z.object({
-    id: z.string(),
-    sensorDeviceId: z.string(),
-    time: z.string(),
+    id: z.string().optional(),
+    sensorDeviceId: z.string().optional(),
+    time: z.string().optional(),
+    timestamp: z.string().optional(),
     value: z.number(),
-    sensor: z.string().nullable(),
+    sensor: z.string().nullable().optional(),
 })
 
 export type SensorData = z.infer<typeof SensorDataObject>

@@ -7,8 +7,8 @@ const LogObject = z.object({
     deviceName: z.string(),
     action: z.string(),
     detail: z.string(),
-    logdeviceId: z.string().nullable(),
-    device: z.string().nullable(),
+    logdeviceId: z.string().nullable().optional(),
+    device: z.string().nullable().optional(),
 })
 
 export type LogType = z.infer<typeof LogObject>

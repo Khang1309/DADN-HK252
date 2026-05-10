@@ -4,7 +4,7 @@ import { jwtDecode } from 'jwt-decode'
 
 
 const axiosClient = axios.create({
-    baseURL: 'http://127.0.0.1:5189',
+    baseURL: 'http://localhost:5189',
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json',

@@ -38,7 +38,7 @@ export default function SensorCard({ sensorInfo, roomId }: SensorCardProps) {
   const [valueMin, setValueMin] = useState(sensorInfo.thresholdMin || 0)
   const [valueMax, setValueMax] = useState(sensorInfo.thresholdMax || 100)
 
-  const latestData = sensor ? sensor.data[sensor.data.length - 1] : null
+  const latestData = sensor && sensor.data.length > 0 ? sensor.data[0] : null
 
   const handleDelete = async () => {
     await deleteSensor(sensorInfo.deviceId, roomId)
