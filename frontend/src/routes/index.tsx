@@ -1,32 +1,43 @@
-import { createBrowserRouter } from 'react-router';
+import { createBrowserRouter } from 'react-router'
 
-import MainLayout from '../layout/MainLayout';
+import MainLayout from '../layout/MainLayout'
 
-import Home from '../pages/Home';
-import Login from '../pages/Login';
+import Home from '../pages/Home'
+import Login from '../pages/Login'
 import Chart from '../pages/Chart'
-import History from '../pages/History';
+import History from '../pages/History'
+import Settings from '@/pages/Settings'
+import Support from '@/pages/Support'
 
 export const router = createBrowserRouter([
-    {
-        // 1. THE PROTECTED AREA (Uses SideBar/Header)
-        path: "/",
-        element: <MainLayout />,
-        children: [
-            { index: true, element: <Home /> },           // URL: /
-            { path: "dashboard", element: <Home /> },    // URL: /dashboard
-            { path: "chart", element: <Chart /> },
-            { path: "history", element: <History /> },   // URL: /history
-        ]
-    },
-    {
-        // 2. THE PUBLIC AREA (No SideBar)
-        path: "/login",
-        element: <Login />
-    },
-    {
-        // 3. THE "OVAL" (Catch-all for 404 errors)
-        path: "*",
-        element: <div>404 - Page Not Found</div>
-    }
-]);
+  {
+    // Protected area (uses SideBar/Header)
+    path: '/',
+    element: <MainLayout />,
+    children: [
+      { index: true, element: <Home /> },
+      { path: 'dashboard', element: <Home /> },
+      { path: 'chart', element: <Chart /> },
+      { path: 'history', element: <History /> },
+      { path: 'settings', element: <Settings /> },
+      { path: 'support', element: <Support /> },
+    ],
+  },
+  {
+    // Public area
+    path: '/login',
+    element: <Login />,
+  },
+  {
+    // 404
+    path: '*',
+    element: (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-6xl font-bold text-muted-foreground">404</h1>
+          <p className="text-lg text-muted-foreground mt-2">Page not found</p>
+        </div>
+      </div>
+    ),
+  },
+])

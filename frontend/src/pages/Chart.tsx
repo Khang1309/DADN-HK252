@@ -1,148 +1,179 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
 
-import MyLineChart from '../components/LineChart';
-import { useDevicesStore } from '../store/useDevicesStore';
-import Dropdown from '../components/Dropdown';
-import { useRoomInfo } from '../store/useRoomInfo';
-import { useChartStore } from '../store/useChartStore';
-import { theme } from '../utils/theme';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import EChartsWrapper from '@/components/EChartsWrapper'
+import { useDevicesStore } from '@/store/useDevicesStore'
+import { useRoomInfo } from '@/store/useRoomInfo'
+import { useChartStore } from '@/store/useChartStore'
 
-function Chart() {
-    const rooms = useRoomInfo(s => s.rooms)
-    const sensorData = useDevicesStore(s => s.listOfSensor)
-    const fetchDevices = useDevicesStore(s => s.fetchDevices);
+export default function Chart() {
+  const rooms = useRoomInfo((s) => s.rooms)
+  const sensorData = useDevicesStore((s) => s.listOfSensor)
+  const fetchDevices = useDevicesStore((s) => s.fetchDevices)
 
-    // Use store for persistent state
-    const currentRoom = useChartStore(s => s.currentRoom)
-    const currentSensor = useChartStore(s => s.currentSensor)
-    const setCurrentRoom = useChartStore(s => s.setCurrentRoom)
-    const setCurrentSensor = useChartStore(s => s.setCurrentSensor)
+  const currentRoom = useChartStore((s) => s.currentRoom)
+  const currentSensor = useChartStore((s) => s.currentSensor)
+  const setCurrentRoom = useChartStore((s) => s.setCurrentRoom)
+  const setCurrentSensor = useChartStore((s) => s.setCurrentSensor)
 
-    const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true)
 
-    const handleSelectRoom = (room: any) => {
-        setCurrentRoom(room);
-        setCurrentSensor(sensorData[room.roomId]?.[0] || null);
+  const handleSelectRoom = (roomId: string) => {
+    const room = rooms.find((r) => r.roomId === roomId)
+    if (room) {
+      setCurrentRoom(room)
+      setCurrentSensor(sensorData[room.roomId]?.[0] || null)
+    }
+  }
+
+  const handleSelectSensor = (sensorId: string) => {
+    if (!currentRoom) return
+    const sensor = sensorData[currentRoom.roomId]?.find((s) => s.deviceId === sensorId)
+    if (sensor) setCurrentSensor(sensor)
+  }
+
+  useEffect(() => {
+    const loadData = async () => {
+      setIsLoading(true)
+      await fetchDevices()
+      setIsLoading(false)
     }
 
-    // Initialize data on mount
-    useEffect(() => {
-        const loadData = async () => {
-            setIsLoading(true);
-            await fetchDevices();
-            setIsLoading(false);
-        };
-
-        if (Object.keys(sensorData).length === 0) {
-            loadData();
-        } else {
-            setIsLoading(false);
-        }
-    }, []);
-
-    // Initialize room and sensor selection only on first load
-    useEffect(() => {
-        if (rooms.length > 0 && !currentRoom) {
-            const firstRoom = rooms[0];
-            setCurrentRoom(firstRoom);
-            setCurrentSensor(sensorData[firstRoom.roomId]?.[0] || null);
-        }
-    }, [rooms, currentRoom, currentSensor, sensorData, setCurrentRoom, setCurrentSensor]);
-
-    if (isLoading) {
-        return <div className="p-4">Loading your smart home data...</div>;
+    if (Object.keys(sensorData).length === 0) {
+      loadData()
+    } else {
+      setIsLoading(false)
     }
+  }, [])
 
-    return <div className="p-4 font-[600] h-[85vh]" >
-        <div className='text-[3em] text-black'>View your statistic</div>
-        <div style={{ background: '#fff', boxShadow: '2px 2px #e5e7eb' }} className='rounded-[10px] p-4'>
-            <div className='flex' >
-                <div className='text-black flex-3'>Choose your sensor</div>
-                <div className='flex-1'>
-                    <Dropdown
-                        element1={
-                            <span className='flex justify-center items-center gap-2'>
-                                {currentRoom?.roomName || "Select Room"}
+  useEffect(() => {
+    if (rooms.length > 0 && !currentRoom) {
+      const firstRoom = rooms[0]
+      setCurrentRoom(firstRoom)
+      setCurrentSensor(sensorData[firstRoom.roomId]?.[0] || null)
+    }
+  }, [rooms, currentRoom, sensorData, setCurrentRoom, setCurrentSensor])
 
-                            </span>
-                        }
-                        element2={
-                            rooms.map(room => (
-                                <div
-                                    key={room.roomId}
-                                    onClick={() => handleSelectRoom(room)}
-                                    className="cursor-pointer p-2 w-full"
-                                >
-                                    {room.roomName}
-                                </div>
-                            ))
-                        }
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-[80vh]">
+        <div className="text-muted-foreground">Loading your smart home data...</div>
+      </div>
+    )
+  }
 
-                    />
+  return (
+    <div className="p-6 space-y-6">
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <h1 className="text-3xl font-bold tracking-tight">Chart</h1>
+        <p className="text-muted-foreground mt-1">View your sensor statistics</p>
+      </motion.div>
 
-                </div>
-                <div className='flex-1'>
-                    <Dropdown
-                        element1={
-                            <span className='flex justify-center items-center gap-2'>
-                                {currentSensor?.deviceName || "Select Sensor"}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+      >
+        <Card>
+          <CardHeader>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <CardTitle>Sensor Data</CardTitle>
+              <div className="flex gap-3">
+                <Select
+                  value={currentRoom?.roomId || ''}
+                  onValueChange={handleSelectRoom}
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Select Room" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {rooms.map((room) => (
+                      <SelectItem key={room.roomId} value={room.roomId}>
+                        {room.roomName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
-                            </span>
-                        }
-                        element2={
-                            currentRoom && sensorData[currentRoom.roomId]
-                                ? sensorData[currentRoom.roomId].map(device => (
-                                    <div
-                                        key={device.deviceId}
-                                        onClick={() => setCurrentSensor(device)}
-                                        className="cursor-pointer p-2 w-full"
-                                    >
-                                        {device.deviceName}
-                                    </div>
-                                ))
-                                : []
-                        }
-
-                    />
-                </div>
+                <Select
+                  value={currentSensor?.deviceId || ''}
+                  onValueChange={handleSelectSensor}
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Select Sensor" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {currentRoom && sensorData[currentRoom.roomId]
+                      ? sensorData[currentRoom.roomId].map((device) => (
+                          <SelectItem key={device.deviceId} value={device.deviceId}>
+                            {device.deviceName}
+                          </SelectItem>
+                        ))
+                      : null}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
+          </CardHeader>
 
-            {
-                currentSensor ?
-
-                    <MyLineChart
-                        option={{
-                            xAxis: {
-                                type: 'category',
-                                boundaryGap: false,
-                                // prettier-ignore
-                                data: currentSensor.data.map((sensorData) => {
-                                    const date = new Date(sensorData.time)
-                                    return date.toLocaleTimeString('vi-VN', { hour12: false });
-
-                                }
-                                )
-                            },
-                            yAxis: {
-                                type: 'value'
-                            },
-                            series: [
-                                {
-                                    data: currentSensor.data.map((sensorData) =>
-                                        sensorData.value
-                                    ),
-                                    type: 'line'
-                                }
-                            ]
-                        }}
-                        width="100%"
-                        height="500px"
-                    />
-                    : <div className='text-black'>No data</div>
-            }
-
-        </div>
+          <CardContent>
+            {currentSensor ? (
+              <EChartsWrapper
+                option={{
+                  tooltip: {
+                    trigger: 'axis',
+                  },
+                  grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true,
+                  },
+                  xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: currentSensor.data.map((d) => {
+                      const date = new Date(d.time)
+                      return date.toLocaleTimeString('vi-VN', { hour12: false })
+                    }),
+                  },
+                  yAxis: {
+                    type: 'value',
+                  },
+                  series: [
+                    {
+                      data: currentSensor.data.map((d) => d.value),
+                      type: 'line',
+                      smooth: true,
+                      areaStyle: {
+                        opacity: 0.1,
+                      },
+                    },
+                  ],
+                }}
+                width="100%"
+                height="500px"
+              />
+            ) : (
+              <div className="flex items-center justify-center h-[400px] text-muted-foreground">
+                No sensor data available. Select a room and sensor above.
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
+  )
 }
-
-export default Chart;

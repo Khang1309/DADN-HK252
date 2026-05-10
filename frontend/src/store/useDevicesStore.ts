@@ -55,7 +55,7 @@ export const useDevicesStore = create<DeviceData>((set, get) => ({
         try {
             const data = await axiosClient.get(`/api/devices/${sensorId}/data`)
             const realData = SensorDataList.parse(data)
-
+            console.log(realData, '123')
             return realData;
         } catch (error) {
             console.log("Error getting sensor data" + sensorId)
@@ -77,10 +77,10 @@ export const useDevicesStore = create<DeviceData>((set, get) => ({
 
 
                     const sensors = allDevices.filter((device) => device.type === 'SENSOR');
-
+                    console.log(sensors)
                     await Promise.all(sensors.map(async (sensor) => {
                         const data = await get().fetchSensorData(sensor.deviceId)
-                        console.log(data);
+
                         sensor["data"] = data;
                     }))
 

@@ -1,201 +1,307 @@
-import { useMemo, useState, useEffect } from "react"
-import { IoMdArrowDropleft } from "react-icons/io"
-import Dropdown from "../components/Dropdown"
-import { useHistoryStore } from "../store/useHistoryStore"
-import { useRoomInfo } from "../store/useRoomInfo"
-import { useDevicesStore } from "../store/useDevicesStore"
-import axiosClient from "../apis/api"
+import { useMemo, useState, useEffect, useRef } from 'react'
+import { motion } from 'framer-motion'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
-interface LogEntry {
-    id: string
-    deviceId: string
-    deviceName: string
-    action: string
-    timestamp: string
-    status: string
-}
+import { Field, FieldLabel } from '@/components/ui/field'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+
+} from '@/components/ui/select'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+
+import { useHistoryStore } from '@/store/useHistoryStore'
+import { useRoomInfo } from '@/store/useRoomInfo'
+import { useDevicesStore } from '@/store/useDevicesStore'
+import axiosClient from '@/apis/api'
+import { type LogType, LogArray } from '@/schema/log'
 
 export default function History() {
-    const rooms = useRoomInfo(s => s.rooms)
-    const sensors = useDevicesStore(s => s.listOfSensor)
-    const outputs = useDevicesStore(s => s.listOfOutput)
-    const { currentRoom, currentDevice, setCurrentRoom, setCurrentDevice } = useHistoryStore()
+  const rooms = useRoomInfo((s) => s.rooms)
+  const sensors = useDevicesStore((s) => s.listOfSensor)
+  const outputs = useDevicesStore((s) => s.listOfOutput)
+  const { currentRoom, currentDevice, setCurrentRoom, setCurrentDevice } = useHistoryStore()
 
+  const [logs, setLogs] = useState<LogType[]>([])
+  const [currentPage, setCurrentPage] = useState(1)
 
-    const [logs, setLogs] = useState<LogEntry[]>([])
-    const [currentPage, setCurrentPage] = useState(1)
-    const [totalPages, setTotalPages] = useState(1)
-    const [isLoading, setIsLoading] = useState(false)
-    const itemsPerPage = 10
+  const [isLoading, setIsLoading] = useState(false)
+  const [itemsPerPage, setItemsPerPage] = useState(10)
 
-    // Combined devices array from sensors + outputs for the selected room
-    const devices = useMemo(() => {
-        if (!currentRoom) return []
-        const roomSensors = sensors[currentRoom.roomId] || []
-        const roomOutputs = outputs[currentRoom.roomId] || []
-        return [...roomSensors, ...roomOutputs]
-    }, [currentRoom, sensors, outputs])
+  const devices = useMemo(() => {
+    if (!currentRoom) return []
+    const roomSensors = sensors[currentRoom.roomId] || []
+    const roomOutputs = outputs[currentRoom.roomId] || []
+    return [...roomSensors, ...roomOutputs]
+  }, [currentRoom, sensors, outputs])
 
-    const handleSelectRoom = (room: any) => {
-        setCurrentRoom(room)
-        setCurrentDevice(devices[0] || null)
-        setCurrentPage(1)
+  const handleSelectRoom = (roomId: string) => {
+    const room = rooms.find((r) => r.roomId === roomId)
+    if (room) {
+      setCurrentRoom(room)
+      setCurrentDevice(null)
+      setCurrentPage(1)
     }
-
-    const handleSelectDevice = (device: any) => {
-        setCurrentDevice(device)
-        setCurrentPage(1)
+    else {
+      setCurrentRoom(null)
+      setCurrentDevice(null)
+      setCurrentPage(1)
     }
+  }
 
-    // Fetch logs with pagination
-    useEffect(() => {
-        const fetchLogs = async () => {
-            setIsLoading(true)
-            try {
-                const response = await axiosClient.get('/api/logs', {
-                    params: {
-                        page: currentPage,
-                        limit: itemsPerPage
-                    }
-                })
-                console.log(response)
+  const handleSelectDevice = (deviceId: string) => {
+    const device = devices.find((d) => d.deviceId === deviceId)
+    if (device) {
+      setCurrentDevice(device)
+      setCurrentPage(1)
+    }
+  }
 
-                setLogs(response || [])
-                setTotalPages(response.data.totalPages || 1)
-            } catch (error) {
-                console.error('Failed to fetch logs:', error)
-            } finally {
-                setIsLoading(false)
-            }
+  const sectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const fetchLogs = async () => {
+      setIsLoading(true)
+      try {
+        if (!currentRoom) {
+          const response = await axiosClient.get('/api/logs', {
+            params: {
+              page: currentPage,
+              limit: itemsPerPage + 1,
+            },
+          })
+          const data = LogArray.parse(response)
+          setLogs(data || [])
         }
+        else {
+          if (currentDevice) {
+            const response = await axiosClient.get(`/api/devices/${currentDevice?.deviceId}/logs`, {
+              params: {
+                page: currentPage,
+                limit: itemsPerPage + 1,
+              },
+            })
+            const data = LogArray.parse(response)
+            setLogs(data || [])
+          }
+          else {
+            setLogs([])
 
-        fetchLogs()
-    }, [currentPage])
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch logs:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
 
-    return <div className="p-4 font-[600]">
-        <div className="text-black text-[3em] mb-4">View your history</div>
+    fetchLogs()
 
-        <div style={{ background: '#fff', boxShadow: '2px 2px #e5e7eb' }} className='rounded-[10px] p-4 mb-4'>
-            <div className="text-black text-lg mb-3">Filter by device</div>
-            <div className="flex gap-4">
-                {/* Room Dropdown */}
-                <div className="">
-                    <Dropdown
-                        element1={
-                            <span className='flex justify-center items-center gap-2'>
-                                {currentRoom?.roomName || "Select Room"}
+  }, [currentPage, currentRoom, currentDevice, itemsPerPage])
 
-                            </span>
-                        }
-                        element2={
-                            rooms.map(room => (
-                                <div
-                                    key={room.roomId}
-                                    onClick={() => handleSelectRoom(room)}
-                                    className="cursor-pointer p-2 w-full"
-                                >
-                                    {room.roomName}
-                                </div>
-                            ))
-                        }
+  useEffect(() => {
+    const scrollTimeout = setTimeout(() => {
+      if (sectionRef.current) {
+        sectionRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }
+    }, 100);
+    console.log(sectionRef)
+    return () => clearTimeout(scrollTimeout);
+  }, [currentPage, itemsPerPage]);
+  return (
+    <div className="p-6 space-y-6">
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <h1 className="text-3xl font-bold tracking-tight">History</h1>
+        <p className="text-muted-foreground mt-1">View your device activity logs</p>
+      </motion.div>
 
-                    />
-                </div>
+      {/* Filters */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+      >
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Filter by device</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-3">
+              <Select
+                value={currentRoom?.roomId || 'All'}
+                onValueChange={handleSelectRoom}
+              >
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue placeholder="Select Room" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem key="All" value="All">All</SelectItem>
+                  {rooms.map((room) => (
+                    <SelectItem key={room.roomId} value={room.roomId}>
+                      {room.roomName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-                {/* Device Dropdown */}
-                {currentRoom && (
-                    <div className="">
-                        <Dropdown
-                            element1={
-                                <span className='flex justify-center items-center gap-2'>
-                                    {currentDevice?.deviceName || "Select Device"}
-
-                                </span>
-                            }
-                            element2={
-                                devices.map(device => (
-                                    <div
-                                        key={device.deviceId}
-                                        onClick={() => handleSelectDevice(device)}
-                                        className="cursor-pointer p-2 w-full"
-                                    >
-                                        {device.deviceName}
-                                    </div>
-                                ))
-                            }
-                        />
-                    </div>
-                )}
+              {currentRoom && currentRoom.roomId != 'All' && (
+                <Select
+                  value={currentDevice?.deviceId || ''}
+                  onValueChange={handleSelectDevice}
+                >
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue placeholder="Select Device" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {devices.map((device) => (
+                      <SelectItem key={device.deviceId} value={device.deviceId}>
+                        {device.deviceName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
-        </div>
+          </CardContent>
+        </Card>
+      </motion.div>
 
-        {/* History Cards */}
-        <div style={{ background: '#fff', boxShadow: '2px 2px #e5e7eb' }} className='rounded-[10px] p-4'>
-            <div className="text-black text-lg mb-4">Activity Logs</div>
+      {/* Logs table */}
+      <div ref={sectionRef}>
 
+      </div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.2 }}
+      >
+        <Card >
+          <CardHeader>
+            <CardTitle className="text-base">Activity Logs</CardTitle>
+          </CardHeader>
+          <CardContent>
             {isLoading ? (
-                <div className="text-center text-gray-500 py-8">Loading logs...</div>
+              <div className="flex items-center justify-center py-12 text-muted-foreground">
+                Loading logs...
+              </div>
             ) : logs.length === 0 ? (
-                <div className="text-center text-gray-500 py-8">No logs available</div>
+              <div className="flex items-center justify-center py-12 text-muted-foreground">
+                No logs available
+              </div>
             ) : (
-                <>
-                    <div className="space-y-3">
-                        {logs.map((log) => (
-                            <div key={log.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
-                                <div className="flex justify-between items-start mb-2">
-                                    <div>
-                                        <h3 className="text-black font-semibold">{log.deviceName}</h3>
-                                        <p className="text-gray-600 text-sm">{log.action}</p>
-                                    </div>
-                                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${log.status === 'ON' || log.status === 'Success'
-                                        ? 'bg-green-100 text-green-800'
-                                        : 'bg-red-100 text-red-800'
-                                        }`}>
-                                        {log.status}
-                                    </span>
-                                </div>
-                                <p className="text-gray-500 text-xs">
-                                    {new Date(log.timestamp).toLocaleString('vi-VN')}
-                                </p>
-                            </div>
-                        ))}
-                    </div>
+              <>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Device</TableHead>
+                      <TableHead>Action</TableHead>
+                      <TableHead>Details</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead className="text-right">Time</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {logs.map((log) => (
+                      <TableRow key={log.logsId}>
+                        <TableCell className="font-medium">{log.deviceName}</TableCell>
+                        <TableCell>{log.action}</TableCell>
+                        <TableCell className="text-muted-foreground w-[50%] truncate">
+                          {log.detail}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant='success'>
+                            {log.logType ? 'Output' : 'Sensor'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right text-muted-foreground text-sm">
+                          {new Date(log.timestamp).toLocaleString('vi-VN', {
+                            dateStyle: 'medium',
+                            timeStyle: 'short',
+                          })}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
 
-                    {/* Pagination */}
-                    <div className="flex justify-center items-center gap-2 mt-6">
-                        <button
-                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                            disabled={currentPage === 1}
-                            className="px-4 py-2 bg-gray-800 text-white rounded-md disabled:bg-gray-400 hover:bg-gray-700"
-                        >
-                            Previous
-                        </button>
+                {/* Pagination */}
+                <div className="flex items-center justify-center gap-2 mt-6">
+                  <Field orientation="horizontal" className="w-fit">
+                    <FieldLabel htmlFor="select-rows-per-page">Rows per page</FieldLabel>
+                    <Select defaultValue="10" value={String(itemsPerPage)} onValueChange={(val) => { setItemsPerPage(Number(val)); setCurrentPage(1) }}>
+                      <SelectTrigger className="w-20" id="select-rows-per-page">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent align="start">
+                        <SelectItem value="10">10</SelectItem>
+                        <SelectItem value="25">25</SelectItem>
+                        <SelectItem value="50">50</SelectItem>
+                        <SelectItem value="100">100</SelectItem>
 
-                        <div className="flex gap-1">
-                            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                                <button
-                                    key={page}
-                                    onClick={() => setCurrentPage(page)}
-                                    className={`px-3 py-2 rounded-md ${currentPage === page
-                                        ? 'bg-blue-600 text-white'
-                                        : 'bg-gray-200 text-black hover:bg-gray-300'
-                                        }`}
-                                >
-                                    {page}
-                                </button>
-                            ))}
-                        </div>
+                      </SelectContent>
+                    </Select>
+                  </Field>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => { setCurrentPage((prev) => (prev - 1)) }}
+                    disabled={currentPage <= 1}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    Prev
+                  </Button>
 
-                        <button
-                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                            disabled={currentPage === totalPages}
-                            className="px-4 py-2 bg-gray-800 text-white rounded-md disabled:bg-gray-400 hover:bg-gray-700"
-                        >
-                            Next
-                        </button>
-                    </div>
-                </>
+                  <div className="flex items-center gap-1">
+
+                    <Button
+
+                      variant={'default'}
+                      size="sm"
+                      className="w-8 h-8 p-0"
+
+
+                    >
+                      {currentPage}
+                    </Button>
+
+                  </div>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => { setCurrentPage((prev) => (prev + 1)) }}
+                    disabled={logs.length < itemsPerPage + 1}
+                  >
+                    Next
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </>
             )}
-        </div>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
+  )
 }

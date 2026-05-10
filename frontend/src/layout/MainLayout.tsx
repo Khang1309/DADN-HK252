@@ -1,51 +1,47 @@
-import { useState, useEffect } from "react";
-import { Outlet } from "react-router-dom";
-import { Navigate } from "react-router-dom";
+import { useState, useEffect } from 'react'
+import { Outlet, Navigate } from 'react-router-dom'
 
-import s from "./MainLayout.module.css"
-import Header from "./Header";
-import SideBar from "./SideBar";
-import { useUserInfoStore } from "../store/useUserStore";
-import { useRoomInfo } from "../store/useRoomInfo";
-import { useDevicesStore } from "../store/useDevicesStore";
+import Header from './Header'
+import SideBar from './SideBar'
+import { useUserInfoStore } from '@/store/useUserStore'
+import { useRoomInfo } from '@/store/useRoomInfo'
+import { useDevicesStore } from '@/store/useDevicesStore'
 
 export default function MainLayout() {
-    const [openMenu, setOpenMenu] = useState(true)
+  const [openMenu, setOpenMenu] = useState(true)
 
-    const fetchRoom = useRoomInfo((state) => state.fetchRooms)
+  const fetchRoom = useRoomInfo((state) => state.fetchRooms)
+  const fetchDevices = useDevicesStore((s) => s.fetchDevices)
+  const userInfo = useUserInfoStore((s) => s.info)
 
-    const fetchDevices = useDevicesStore(s => s.fetchDevices)
+  useEffect(() => {
+    fetchRoom()
+  }, [fetchRoom])
 
-    const userInfo = useUserInfoStore(s => s.info)
+  useEffect(() => {
+    fetchDevices()
 
-    useEffect(() => {
-        fetchRoom()
-    }, [fetchRoom])
+    const interval = setInterval(() => {
+      fetchDevices()
+    }, 30000)
 
-    useEffect(() => {
-        fetchDevices()
+    return () => clearInterval(interval)
+  }, [fetchDevices])
 
-        const interval = setInterval(() => {
-            console.log('fetchingDevices')
-            fetchDevices()
-        }
-            , 30000
-        )
+  if (!userInfo || !userInfo.token) {
+    return <Navigate to="/login" replace={true} />
+  }
 
-        return () => clearInterval(interval)
-    }, [fetchDevices])
+  return (
+    <div className="flex h-screen overflow-hidden bg-background">
+      <SideBar isOpen={openMenu} />
 
-    if (!userInfo || !userInfo.token) {
-        console.log("mainlay")
-        return <Navigate to="/login" replace={true} />
-    }
-
-    return <div className={s.container}>
-        <SideBar isOpen={openMenu}></SideBar>
-
-        <div className={s.contentArea}>
-            <Header onMenuClick={() => setOpenMenu(!openMenu)} />
-            <Outlet />
-        </div>
+      <div className="flex flex-1 flex-col overflow-y-auto min-w-0 transition-all duration-300">
+        <Header onMenuClick={() => setOpenMenu(!openMenu)} />
+        <main className="flex-1">
+          <Outlet />
+        </main>
+      </div>
     </div>
+  )
 }

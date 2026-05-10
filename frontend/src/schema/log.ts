@@ -3,11 +3,11 @@ import * as z from 'zod'
 const LogObject = z.object({
     logsId: z.string(),
     timestamp: z.string(),
-    logType: z.boolean(),
+    logType: z.number(),
     deviceName: z.string(),
     action: z.string(),
-    details: z.string(),
-    deviceId: z.string(),
+    detail: z.string(),
+    logdeviceId: z.string().nullable(),
     device: z.string().nullable(),
 })
 
