@@ -15,6 +15,7 @@ interface UserInfoState {
     login: (email: string, password: string) => Promise<void>
     register: (email: string, password: string, fullname: string) => Promise<void>
     logout: () => Promise<void>
+    changePassword: (oldPassword: string, newPassword: string, confirmPassword: string) => Promise<void>
 }
 
 
@@ -92,6 +93,26 @@ export const useUserInfoStore = create<UserInfoState>()(
                     isLoading: false
                 });
 
+            }
+        },
+        changePassword: async (oldPassword, newPassword, confirmPassword) => {
+            set({ isLoading: true, err: null });
+            try {
+                await axiosClient.post("/api/Auth/change-password", {
+                    oldPassword,
+                    newPassword,
+                    confirmPassword
+                });
+                set({ isLoading: false });
+            } catch (errs) {
+                const error = errs as any;
+                const errorMessage = error?.response?.data?.message || error?.message || "An unknown error occurred";
+                set({
+                    err: `Failed to change password: ${errorMessage}`,
+                    isLoading: false
+                });
+                console.log(errs);
+                throw errs;
             }
         }
     }),
