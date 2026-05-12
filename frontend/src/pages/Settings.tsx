@@ -2,8 +2,9 @@ import React from 'react'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Mail, LockKeyhole, Info } from 'lucide-react'
+import toast from 'react-hot-toast'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import {
     Tooltip,
     TooltipContent,
@@ -19,10 +20,26 @@ import { useUserInfoStore } from '@/store/useUserStore'
 function Settings() {
 
     const currentMail = useUserInfoStore(s => s.info?.email)
+    const changePassword = useUserInfoStore(s => s.changePassword)
+    const isLoading = useUserInfoStore(s => s.isLoading)
 
     const [curPass, setCurPass] = useState('')
     const [newPass, setNewPass] = useState('')
     const [confirmPass, setConfirmPass] = useState('')
+
+    const handleUpdatePassword = async () => {
+        try {
+            await changePassword(curPass, newPass, confirmPass)
+            toast.success('Password updated successfully!')
+            setCurPass('')
+            setNewPass('')
+            setConfirmPass('')
+        } catch (error) {
+            const err = error as any;
+            const errorMessage = err?.response?.data?.message || err?.message || "Failed to update password";
+            toast.error(errorMessage)
+        }
+    }
 
 
     return (
@@ -96,6 +113,7 @@ function Settings() {
                                 <Input className='hover:border-blue-500'
                                     id="current-pass" type="password"
                                     placeholder="Enter your current password"
+                                    value={curPass}
                                     onChange={(e) => setCurPass(e.target.value)} />
                             </div>
 
@@ -116,6 +134,7 @@ function Settings() {
                                     className='hover:border-blue-500'
                                     id="new-pass" type="password"
                                     placeholder="Enter your new password"
+                                    value={newPass}
                                     onChange={(e) => setNewPass(e.target.value)} />
                             </div>
 
@@ -136,16 +155,19 @@ function Settings() {
                                 <Input className='hover:border-blue-500'
                                     id="confirm-pass" type="password"
                                     placeholder="Confirm your new password"
+                                    value={confirmPass}
                                     onChange={(e) => setConfirmPass(e.target.value)}
                                     aria-invalid={confirmPass != newPass}
                                 />
-                                {confirmPass !== newPass ? (
+                                {confirmPass !== '' && confirmPass !== newPass ? (
                                     <p className="text-red-500 text-sm">Password doesn't match!</p>
                                 ) : null}
                             </div>
                             <div className="col-start-2 flex gap-2 font-bold">
-                                <Button disabled={curPass == '' || newPass == '' || confirmPass == '' || newPass != confirmPass}>
-                                    Update password
+                                <Button 
+                                    onClick={handleUpdatePassword}
+                                    disabled={isLoading || curPass == '' || newPass == '' || confirmPass == '' || newPass != confirmPass}>
+                                    {isLoading ? 'Updating...' : 'Update password'}
                                 </Button>
                             </div>
                         </div>

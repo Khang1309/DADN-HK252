@@ -144,8 +144,8 @@ export default function Chart() {
                   xAxis: {
                     type: 'category',
                     boundaryGap: false,
-                    data: currentSensor.data.map((d) => {
-                      const date = new Date(d.time)
+                    data: [...currentSensor.data].reverse().map((d) => {
+                      const date = new Date(d.time || d.timestamp || '')
                       return date.toLocaleTimeString('vi-VN', { hour12: false })
                     }),
                   },
@@ -154,7 +154,7 @@ export default function Chart() {
                   },
                   series: [
                     {
-                      data: currentSensor.data.map((d) => d.value),
+                      data: [...currentSensor.data].reverse().map((d) => d.value),
                       type: 'line',
                       smooth: true,
                       areaStyle: {

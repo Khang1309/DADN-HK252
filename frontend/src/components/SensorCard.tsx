@@ -38,7 +38,7 @@ export default function SensorCard({ sensorInfo, roomId }: SensorCardProps) {
   const [valueMin, setValueMin] = useState(sensorInfo.thresholdMin || 0)
   const [valueMax, setValueMax] = useState(sensorInfo.thresholdMax || 100)
 
-  const latestData = sensor ? sensor.data[sensor.data.length - 1] : null
+  const latestData = sensor && sensor.data.length > 0 ? sensor.data[0] : null
 
   const handleDelete = async () => {
     await deleteSensor(sensorInfo.deviceId, roomId)
@@ -144,7 +144,7 @@ export default function SensorCard({ sensorInfo, roomId }: SensorCardProps) {
               <span className="text-sm text-muted-foreground">Current Value</span>
               <span className="text-sm font-bold">
                 {latestData?.value !== undefined
-                  ? `${(latestData.value * 0.1).toFixed(1)}°C`
+                  ? latestData.value
                   : 'Loading...'}
               </span>
             </div>

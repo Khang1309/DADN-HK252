@@ -73,15 +73,21 @@ export const useDevicesStore = create<DeviceData>((set, get) => ({
 
                     const allDevices: any[] = await axiosClient.get(`/api/rooms/${room.roomId}/devices`);
 
-                    const outputs = allDevices.filter((device) => device.type === 'OUTPUT');
+                    const outputs = (allDevices.filter((device) => device.type === 'OUTPUT') as DeviceType[])
+                        .sort((a, b) => a.deviceId.localeCompare(b.deviceId));
 
+                    const sensors = (allDevices.filter((device) => device.type === 'SENSOR') as SensorType[])
+                        .sort((a, b) => a.deviceId.localeCompare(b.deviceId));
 
-                    const sensors = allDevices.filter((device) => device.type === 'SENSOR');
                     console.log(sensors)
                     await Promise.all(sensors.map(async (sensor) => {
                         const data = await get().fetchSensorData(sensor.deviceId)
-
-                        sensor["data"] = data;
+                        // Sort data by 'time' field descending to ensure newest is first
+                        sensor["data"] = data.sort((a, b) => {
+                            const timeA = a.time ? new Date(a.time).getTime() : 0;
+                            const timeB = b.time ? new Date(b.time).getTime() : 0;
+                            return timeB - timeA;
+                        });
                     }))
 
 

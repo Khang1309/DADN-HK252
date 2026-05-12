@@ -117,6 +117,11 @@ export default function DeviceCard({ device, roomId }: DeviceCardProps) {
               )}
             </div>
             <div className="flex items-center gap-2 ml-2">
+              {device.auto && (
+                <Badge variant="secondary" className="bg-blue-100 text-blue-700 hover:bg-blue-100 animate-pulse border-blue-200">
+                  AUTO
+                </Badge>
+              )}
               <Badge variant={device.state === 'CONNECTED' ? 'success' : 'destructive'}>
                 {device.state}
               </Badge>
@@ -133,11 +138,13 @@ export default function DeviceCard({ device, roomId }: DeviceCardProps) {
           <CardContent className="p-4 space-y-3">
             <div className="flex items-center justify-between rounded-lg bg-muted/30 px-3 py-2">
               <span className="text-sm text-muted-foreground">Current Value</span>
+              <span className="text-sm font-bold">{device.currentValue ?? 0}</span>
             </div>
             <div className="flex justify-center">
               <TripleToggle
                 id={device.deviceId}
                 state={device.onOffState ?? 'OFF'}
+                auto={device.auto ?? false}
               />
             </div>
           </CardContent>

@@ -9,6 +9,7 @@ export const DeviceObject = z.object(
         state: z.string(),
         auto: z.boolean().optional(),
         onOffState: z.string().optional(),
+        currentValue: z.number().optional().nullable(),
         thresholdMin: z.number().optional(),
         thresholdMax: z.number().optional(),
     }
