@@ -8,6 +8,7 @@ import Chart from '../pages/Chart'
 import History from '../pages/History'
 import Settings from '@/pages/Settings'
 import Support from '@/pages/Support'
+import AI from '@/pages/AI'
 
 export const router = createBrowserRouter([
   {
@@ -21,6 +22,7 @@ export const router = createBrowserRouter([
       { path: 'history', element: <History /> },
       { path: 'settings', element: <Settings /> },
       { path: 'support', element: <Support /> },
+      { path: 'ai', element: <AI /> },
     ],
   },
   {

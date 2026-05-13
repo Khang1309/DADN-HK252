@@ -111,7 +111,7 @@ export default function DeviceCard({ device, roomId }: DeviceCardProps) {
 
             >
               <SelectTrigger className="mx-auto w-40">
-                <SelectValue placeholder="Select Room" />
+                <SelectValue placeholder="Select Sensor" />
               </SelectTrigger>
               <SelectContent >
                 {sensor.map((sensor) => (

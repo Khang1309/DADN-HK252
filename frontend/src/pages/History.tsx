@@ -217,7 +217,7 @@ export default function History() {
                       <TableHead>Device</TableHead>
                       <TableHead>Action</TableHead>
                       <TableHead>Details</TableHead>
-                      <TableHead>Type</TableHead>
+                      {/* <TableHead>Type</TableHead> */}
                       <TableHead className="text-right">Time</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -229,11 +229,11 @@ export default function History() {
                         <TableCell className="text-muted-foreground w-[50%] truncate">
                           {log.detail}
                         </TableCell>
-                        <TableCell>
+                        {/* <TableCell>
                           <Badge variant='success'>
                             {log.logType ? 'Output' : 'Sensor'}
                           </Badge>
-                        </TableCell>
+                        </TableCell> */}
                         <TableCell className="text-right text-muted-foreground text-sm">
                           {new Date(log.timestamp).toLocaleString('vi-VN', {
                             dateStyle: 'medium',

@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { LayoutDashboard, BarChart3, History, MessageCircleQuestionMark, Wrench } from 'lucide-react'
+import { LayoutDashboard, BarChart3, History, MessageCircleQuestionMark, Wrench, Bot } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 import logo from '../assets/images/logo.svg'
@@ -10,6 +10,7 @@ const navItemsMenu = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/chart', icon: BarChart3, label: 'Chart' },
   { to: '/history', icon: History, label: 'History' },
+  { to: '/ai', icon: Bot, label: 'AI Control' },
 ]
 
 const navItemsAccount = [
