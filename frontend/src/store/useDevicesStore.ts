@@ -26,6 +26,7 @@ interface DeviceData {
     deleteSensor: (sensorId: string, roomId: string) => Promise<void>
 
     updateSensorForOutput: (currentOutput: string, sensorId: string) => Promise<void>
+    getAllSensorData: () => SensorType[]
 }
 
 export const useDevicesStore = create<DeviceData>((set, get) => ({
@@ -241,6 +242,18 @@ export const useDevicesStore = create<DeviceData>((set, get) => ({
 
         } catch (error) {
             console.log("Error updating sensor for output" + currentOutput)
+        }
+    },
+    getAllSensorData: () => {
+        try {
+            const rooms = useRoomInfo.getState().rooms
+            const allSensors = rooms.map((room) => {
+                return get().listOfSensor[room.roomId] || [];
+            })
+            return allSensors.flat()
+        } catch (error) {
+            console.log("Error fetching all sensor data")
+            return []
         }
     }
 }))

@@ -35,7 +35,8 @@ interface DeviceCardProps {
 }
 
 export default function DeviceCard({ device, roomId }: DeviceCardProps) {
-  const sensor = useDevicesStore((s) => s.listOfSensor[roomId] || [])
+  // sensor list of all room , not just the current room
+  const sensor = useDevicesStore.getState().getAllSensorData()
 
   const editName = useDevicesStore((s) => s.updateNameOutput)
   const deleteDevice = useDevicesStore((s) => s.deleteOutput)
