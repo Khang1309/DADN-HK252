@@ -32,9 +32,9 @@ export default function TripleToggle({ id, state, auto }: TripleToggleProps) {
       if (newState === 'AUTO') {
         setIsSyncing(true)
       }
-      
+
       await axiosClient.post(`/api/devices/${id}/control`, { status: newState })
-      
+
       // If switching to AUTO, or even manually toggling while in auto, wait a bit then refresh 
       if (newState === 'AUTO' || auto) {
         setTimeout(async () => {
@@ -45,7 +45,7 @@ export default function TripleToggle({ id, state, auto }: TripleToggleProps) {
         await fetchDevices()
         setIsSyncing(false)
       }
-      
+
     } catch (error) {
       console.error(`Failed to set device to ${newState}:`, error)
       // Revert if error
@@ -57,7 +57,7 @@ export default function TripleToggle({ id, state, auto }: TripleToggleProps) {
   const activeIndex = STATES.indexOf(isChecked as typeof STATES[number])
 
   return (
-    <div className="relative flex h-8 w-[140px] items-center rounded-full bg-muted p-0.5">
+    <div className="relative flex-1 flex h-8 w-[140px] items-center rounded-full bg-muted p-0.5">
       {/* Animated sliding background */}
       <motion.div
         className="absolute h-7 w-[calc(33.33%-2px)] rounded-full bg-primary shadow-sm"

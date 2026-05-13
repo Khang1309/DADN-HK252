@@ -24,6 +24,8 @@ interface DeviceData {
 
     deleteOutput: (outputId: string, roomId: string) => Promise<void>
     deleteSensor: (sensorId: string, roomId: string) => Promise<void>
+
+    updateSensorForOutput: (currentOutput: string, sensorId: string) => Promise<void>
 }
 
 export const useDevicesStore = create<DeviceData>((set, get) => ({
@@ -231,4 +233,14 @@ export const useDevicesStore = create<DeviceData>((set, get) => ({
         }
 
     },
+    updateSensorForOutput: async (currentOutput: string, sensorId: string) => {
+        try {
+            await axiosClient.put(`/api/devices/${currentOutput}`, { connectedSensorId: sensorId })
+            // After successful update, refresh devices to get the latest data
+            await get().fetchDevices()
+
+        } catch (error) {
+            console.log("Error updating sensor for output" + currentOutput)
+        }
+    }
 }))

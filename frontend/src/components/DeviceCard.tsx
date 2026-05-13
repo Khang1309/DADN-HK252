@@ -15,9 +15,19 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+
 import TripleToggle from '@/components/TripleToggle'
 import { type DeviceType } from '@/schema/device'
 import { useDevicesStore } from '@/store/useDevicesStore'
+import RealButton from './RealButton'
 
 interface DeviceCardProps {
   device: DeviceType
@@ -25,13 +35,17 @@ interface DeviceCardProps {
 }
 
 export default function DeviceCard({ device, roomId }: DeviceCardProps) {
+  const sensor = useDevicesStore((s) => s.listOfSensor[roomId] || [])
+
   const editName = useDevicesStore((s) => s.updateNameOutput)
   const deleteDevice = useDevicesStore((s) => s.deleteOutput)
+  const updateSensorForOutput = useDevicesStore((s) => s.updateSensorForOutput)
 
   const [deviceNameState, setDeviceName] = useState(device.deviceName)
   const [isEdit, setIsEdit] = useState(false)
   const [isDelete, setIsDelete] = useState(false)
   const [editValue, setEditValue] = useState(device.deviceName)
+  const [openChooseSensor, setOpenChooseSensor] = useState(false)
 
   const handleDelete = async () => {
     await deleteDevice(device.deviceId, roomId)
@@ -49,6 +63,16 @@ export default function DeviceCard({ device, roomId }: DeviceCardProps) {
     } catch {
       toast.error('Failed to update name!')
       setIsEdit(false)
+    }
+  }
+
+  const handleChangeSensor = async (sensorId: string) => {
+    try {
+      await updateSensorForOutput(device.deviceId, sensorId)
+      toast.success('Sensor updated successfully!')
+      setOpenChooseSensor(false)
+    } catch (error) {
+      toast.error('Failed to update sensor!')
     }
   }
 
@@ -70,6 +94,32 @@ export default function DeviceCard({ device, roomId }: DeviceCardProps) {
             <Button variant="destructive" onClick={handleDelete}>
               Delete
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={openChooseSensor} onOpenChange={setOpenChooseSensor}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Choose your sensor for your {device.deviceName}</DialogTitle>
+          </DialogHeader>
+          <DialogFooter>
+            <Select
+              value={device.connectedSensorId || ''}
+              onValueChange={handleChangeSensor}
+
+            >
+              <SelectTrigger className="mx-auto w-40">
+                <SelectValue placeholder="Select Room" />
+              </SelectTrigger>
+              <SelectContent >
+                {sensor.map((sensor) => (
+                  <SelectItem key={sensor.deviceId} value={sensor.deviceId}>
+                    {sensor.deviceName}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -140,12 +190,20 @@ export default function DeviceCard({ device, roomId }: DeviceCardProps) {
               <span className="text-sm text-muted-foreground">Current Value</span>
               <span className="text-sm font-bold">{device.currentValue ?? 0}</span>
             </div>
-            <div className="flex justify-center">
+            <div className="flex flex-col md:flex-row justify-center ">
+
               <TripleToggle
                 id={device.deviceId}
                 state={device.onOffState ?? 'OFF'}
                 auto={device.auto ?? false}
+
               />
+              <div className='flex-1 flex  justify-end'>
+                <RealButton onClick={() => setOpenChooseSensor(true)} className="max-w-30 active:shadow-inner flex items-end ">
+
+                  Choose sensor
+                </RealButton>
+              </div>
             </div>
           </CardContent>
         </Card>

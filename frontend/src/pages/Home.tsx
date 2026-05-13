@@ -28,7 +28,7 @@ export default function Home() {
   useEffect(() => {
     const interval = setInterval(() => {
       fetchDevices()
-    }, 5000)
+    }, 30000)
     return () => clearInterval(interval)
   }, [fetchDevices])
 

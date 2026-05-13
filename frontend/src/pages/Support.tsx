@@ -44,7 +44,7 @@ function Support() {
                     type="single"
                     collapsible
                     defaultValue="shipping"
-                    className="w-full"
+                    className="max-w-[100%] md:max-w-[70%] lg:max-w-[50%] mx-auto mt-2"
                 >
                     <AccordionItem value="setup">
                         <AccordionTrigger>How do I pair a new smart device with the app?</AccordionTrigger>
@@ -83,45 +83,51 @@ function Support() {
                 </Accordion>
             </div>
             <div className="">
+                <MyMap />
                 {/* Page header */}
+
                 <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4 }}
                 >
-                    <Card className='rounded-none font-(--font-geist) bg-(--primary-foreground) px-6 py-4 flex flex-col md:flex-row justify-center items-center'>
-                        <img className='w-80 flex-2' src={myLogo} alt="" />
+                    <Card className='rounded-none  font-(--font-geist) bg-(--primary-foreground) px-6 py-4 '>
+                        <div className='flex flex-col md:flex-row justify-center items-center'>
 
-                        <div className=' flex-3'>
+                            <img className='w-80 flex-2' src={myLogo} alt="" />
 
-                            <CardTitle className='text-3xl'>CONTACT WITH US</CardTitle>
-                            <CardContent className='p-0 flex flex-col gap-4'>
-                                <div className='text-xl'>If you need support, please contact us in following channels</div>
-                                <div className='flex flex-col gap-2'>
-                                    <div className='inline-flex gap-2  px-2 py-1  rounded-2xl hover:bg-[rgba(0,0,0,0.1)]'>
-                                        <MapPinned />
-                                        <div>289 Ly Thuong Kiet street, Dien Hong Ward, HCMC</div>
+                            <div className=' flex-3'>
+
+                                <CardTitle className='text-3xl'>CONTACT WITH US</CardTitle>
+                                <CardContent className='p-0 flex flex-col gap-4'>
+                                    <div className='text-xl'>If you need support, please contact us in following channels</div>
+                                    <div className='flex flex-col gap-2'>
+                                        <div className='inline-flex gap-2  px-2 py-1  rounded-2xl hover:bg-[rgba(0,0,0,0.1)]'>
+                                            <MapPinned />
+                                            <div>289 Ly Thuong Kiet street, Dien Hong Ward, HCMC</div>
+                                        </div>
+                                        <a href={'tel:+84901234567'} className='inline-flex gap-2  px-2 py-1 rounded-2xl hover:bg-[rgba(0,0,0,0.1)]'>
+                                            <Phone />
+                                            <div>+84 12345 67891</div>
+                                        </a>
+                                        <a href={'mailto:contact@smarthome.com'} className='inline-flex gap-2 px-2 py-1 rounded-2xl hover:bg-[rgba(0,0,0,0.1)]'>
+                                            <Mail />
+                                            <div>contact@smarthome.com</div>
+                                        </a>
                                     </div>
-                                    <a href={'tel:+84901234567'} className='inline-flex gap-2  px-2 py-1 rounded-2xl hover:bg-[rgba(0,0,0,0.1)]'>
-                                        <Phone />
-                                        <div>+84 12345 67891</div>
-                                    </a>
-                                    <a href={'mailto:contact@smarthome.com'} className='inline-flex gap-2 px-2 py-1 rounded-2xl hover:bg-[rgba(0,0,0,0.1)]'>
-                                        <Mail />
-                                        <div>contact@smarthome.com</div>
-                                    </a>
-                                </div>
-                            </CardContent>
+                                </CardContent>
+                            </div>
+                        </div>
+                        <div className='mt-2 pt-4  text-center text-xs text-gray-500'>
+                            © {new Date().getFullYear()} Smart Home. All rights reserved.
                         </div>
                     </Card>
+
                 </motion.div>
 
 
-                <MyMap />
 
-                <div className='mt-2 pt-8  text-center text-xs text-gray-500'>
-                    © {new Date().getFullYear()} Smart Home. All rights reserved.
-                </div>
+
             </div>
 
 

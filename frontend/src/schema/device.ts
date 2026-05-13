@@ -10,6 +10,7 @@ export const DeviceObject = z.object(
         auto: z.boolean().optional(),
         onOffState: z.string().optional(),
         currentValue: z.number().optional().nullable(),
+        connectedSensorId: z.string().nullable(),
         thresholdMin: z.number().optional(),
         thresholdMax: z.number().optional(),
     }
